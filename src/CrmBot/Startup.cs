@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CrmBot.Internal;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CrmBot
 {
@@ -23,6 +18,16 @@ namespace CrmBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            AddSingletonFromFile<AppSettings>(services, Configuration.GetSection("AppSettings"));
+
+            services.AddSingleton<TelegramBot>(serviceProvider =>
+            {
+                var telegramBotKey = serviceProvider.GetService<AppSettings>().TelegramBotKey;
+                var bot = new TelegramBot(telegramBotKey);
+                bot.Activate();
+                return bot;
+            });
+
             services.AddMvc();
         }
 
@@ -35,6 +40,19 @@ namespace CrmBot
             }
 
             app.UseMvc();
+
+            // Initialize the telegram bot
+            app.ApplicationServices.GetService<TelegramBot>();
+        }
+
+        private static void AddSingletonFromFile<TOptions>(
+            IServiceCollection services,
+            IConfiguration configuration)
+            where TOptions : class, new()
+        {
+            //POCO is created with actual values
+            TOptions options = configuration.Get<TOptions>();
+            services.AddSingleton(options);
         }
     }
 }
