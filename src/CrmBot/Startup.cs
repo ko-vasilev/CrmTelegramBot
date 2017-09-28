@@ -1,4 +1,5 @@
 ﻿using CrmBot.Internal;
+using CrmBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +28,9 @@ namespace CrmBot
                 bot.Activate();
                 return bot;
             });
+            services.AddTransient<AuthorizationService>();
 
+            services.AddMemoryCache();
             services.AddMvc();
         }
 
