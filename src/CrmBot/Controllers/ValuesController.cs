@@ -3,17 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using CrmBot.Services;
+using System.Diagnostics;
 
 namespace CrmBot.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+        public ValuesController(AuthorizationService authService)
+        {
+            this.authService = authService;
+        }
+
+        private AuthorizationService authService;
+
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new string[] { await authService.GetToken(123) };
         }
 
         // GET api/values/5

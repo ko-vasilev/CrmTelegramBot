@@ -5,31 +5,43 @@ namespace CrmBot.Services
 {
     public class AuthorizationService
     {
-        public AuthorizationService(IMemoryCache memoryCache)
+        public AuthorizationService(IMemoryCache memoryCache, AuthenticationStoreService tokenStoreService)
         {
             cache = memoryCache;
+            tokenStore = tokenStoreService;
         }
 
         private readonly IMemoryCache cache;
 
-        public Task<string> GetToken(int chatId)
+        private readonly AuthenticationStoreService tokenStore;
+
+        /// <summary>
+        /// Get access token associated with the chat.
+        /// </summary>
+        /// <param name="chatId">Id of the chat.</param>
+        /// <returns>Access token, or <c>null</c> if no access token associated with the chat.</returns>
+        public async Task<string> GetToken(int chatId)
         {
             var key = GetCacheKey(chatId);
-            cache.Get<string>(key);
 
-            if (!cache.TryGetValue(key, out string token))
+            var token = await cache.GetOrCreateAsync(key, async entry =>
             {
-                return Task.FromResult<string>(null);
-            }
+                var keyEntry = await tokenStore.GetKeyAsync(chatId);
+                return keyEntry?.AccessToken;
+            });
 
-            return Task.FromResult(token);
+            return token;
         }
 
-        public Task SetToken(int chatId, string token)
+        /// <summary>
+        /// Set access token for a chat. Existing access token will be overridden.
+        /// </summary>
+        /// <param name="chatId">Id of the chat.</param>
+        /// <param name="token">Access token.</param>
+        public async Task SetToken(int chatId, string token)
         {
             cache.Set(GetCacheKey(chatId), token);
-
-            return Task.FromResult(0);
+            await tokenStore.UpdateKeyAsync(chatId, token);
         }
 
         private static string GetCacheKey(int primaryKey) => "AuthorizationToken-" + primaryKey;

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Auth;
 
 namespace CrmBot
 {
@@ -20,6 +22,7 @@ namespace CrmBot
         public void ConfigureServices(IServiceCollection services)
         {
             AddSingletonFromFile<AppSettings>(services, Configuration.GetSection("AppSettings"));
+            AddSingletonFromFile<StorageSettings>(services, Configuration.GetSection("StorageSettings"));
 
             services.AddSingleton<TelegramBot>(serviceProvider =>
             {
@@ -28,6 +31,12 @@ namespace CrmBot
                 bot.Activate();
                 return bot;
             });
+            services.AddTransient(serviceProvider =>
+            {
+                var storageSettings = serviceProvider.GetService<StorageSettings>();
+                return new CloudStorageAccount(new StorageCredentials(storageSettings.AccountName, storageSettings.AccessKey), true);
+            });
+            services.AddTransient<AuthenticationStoreService>();
             services.AddTransient<AuthorizationService>();
 
             services.AddMemoryCache();
