@@ -29,7 +29,11 @@ namespace CrmBot.Controllers
                 return BadRequest();
             }
 
-            await authorizationService.SetToken(chatId, accessToken);
+            var success = await authorizationService.SetTokenAsync(chatId, accessToken);
+            if (!success)
+            {
+                return BadRequest();
+            }
 
             return Ok();
         }

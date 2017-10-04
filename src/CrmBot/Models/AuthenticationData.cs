@@ -12,11 +12,15 @@ namespace CrmBot.Models
             PartitionKey = string.Empty;
         }
 
-        public AuthenticationData(int chatId, string accessToken)
+        public AuthenticationData(int chatId, string accessToken, string eTag = null)
             : this()
         {
             ChatId = chatId;
             AccessToken = accessToken;
+            if (eTag != null)
+            {
+                ETag = eTag;
+            }
         }
 
         private int chatId;

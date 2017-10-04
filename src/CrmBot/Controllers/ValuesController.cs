@@ -23,7 +23,7 @@ namespace CrmBot.Controllers
         [HttpGet]
         public async Task<IEnumerable<string>> Get()
         {
-            return new string[] { await authService.GetToken(123) };
+            return new string[] { await authService.GetTokenAsync(123) };
         }
 
         // GET api/values/5

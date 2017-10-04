@@ -35,7 +35,7 @@ namespace CrmBot.Services
             var retrieveResult = await table.ExecuteAsync(TableOperation.Retrieve<AuthenticationData>("", chatId.ToString()));
 
             var result = retrieveResult.Result as AuthenticationData;
-            if (result != null)
+            if (result?.AccessToken != null)
             {
                 result.AccessToken = dataProtector.Unprotect(result.AccessToken);
             }
@@ -47,11 +47,29 @@ namespace CrmBot.Services
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
         /// <param name="accessToken">Access token.</param>
-        public async Task UpdateKeyAsync(int chatId, string accessToken)
+        /// <returns><c>true</c> if update succeed.</returns>
+        public async Task<bool> UpdateKeyAsync(int chatId, string accessToken)
         {
             var table = await GetStorageTable();
+            var relatedEntity = await table.ExecuteAsync(TableOperation.Retrieve("", chatId.ToString()));
+            if (relatedEntity.Result == null)
+            {
+                return false;
+            }
+
             string protectedAccessToken = dataProtector.Protect(accessToken);
-            await table.ExecuteAsync(TableOperation.InsertOrReplace(new AuthenticationData(chatId, protectedAccessToken)));
+            await table.ExecuteAsync(TableOperation.Merge(new AuthenticationData(chatId, protectedAccessToken, relatedEntity.Etag)));
+            return true;
+        }
+
+        /// <summary>
+        /// Register information about chat being able to have an associated access token.
+        /// </summary>
+        /// <param name="chatId">Id of the chat.</param>
+        public async Task RegisterChatAsync(int chatId)
+        {
+            var table = await GetStorageTable();
+            await table.ExecuteAsync(TableOperation.InsertOrMerge(new AuthenticationData(chatId, null)));
         }
 
         /// <summary>
