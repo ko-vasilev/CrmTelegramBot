@@ -39,6 +39,7 @@ namespace CrmBot
             services.AddTransient<AuthenticationStoreService>();
             services.AddTransient<AuthorizationService>();
 
+            services.AddDataProtection();
             services.AddMemoryCache();
             services.AddMvc();
         }

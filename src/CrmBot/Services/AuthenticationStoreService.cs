@@ -1,4 +1,5 @@
 ﻿using CrmBot.Models;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System.Threading.Tasks;
@@ -13,12 +14,15 @@ namespace CrmBot.Services
         /// <summary>
         /// .ctor
         /// </summary>
-        public AuthenticationStoreService(CloudStorageAccount storageAccount)
+        public AuthenticationStoreService(CloudStorageAccount storageAccount, IDataProtectionProvider dataProtectionProvider)
         {
             this.storageAccount = storageAccount;
+            dataProtector = dataProtectionProvider.CreateProtector("AccessToken");
         }
 
         private readonly CloudStorageAccount storageAccount;
+
+        private readonly IDataProtector dataProtector;
 
         /// <summary>
         /// Get authentication key by chat id.
@@ -30,7 +34,12 @@ namespace CrmBot.Services
             var table = await GetStorageTable();
             var retrieveResult = await table.ExecuteAsync(TableOperation.Retrieve<AuthenticationData>("", chatId.ToString()));
 
-            return retrieveResult.Result as AuthenticationData;
+            var result = retrieveResult.Result as AuthenticationData;
+            if (result != null)
+            {
+                result.AccessToken = dataProtector.Unprotect(result.AccessToken);
+            }
+            return result;
         }
 
         /// <summary>
@@ -41,7 +50,8 @@ namespace CrmBot.Services
         public async Task UpdateKeyAsync(int chatId, string accessToken)
         {
             var table = await GetStorageTable();
-            var res = await table.ExecuteAsync(TableOperation.InsertOrReplace(new AuthenticationData(chatId, accessToken)));
+            string protectedAccessToken = dataProtector.Protect(accessToken);
+            await table.ExecuteAsync(TableOperation.InsertOrReplace(new AuthenticationData(chatId, protectedAccessToken)));
         }
 
         /// <summary>
