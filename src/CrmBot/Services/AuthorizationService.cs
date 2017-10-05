@@ -20,7 +20,7 @@ namespace CrmBot.Services
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
         /// <returns>Access token, or <c>null</c> if no access token associated with the chat.</returns>
-        public async Task<string> GetTokenAsync(int chatId)
+        public async Task<string> GetTokenAsync(long chatId)
         {
             var key = GetCacheKey(chatId);
 
@@ -39,7 +39,7 @@ namespace CrmBot.Services
         /// <param name="chatId">Id of the chat.</param>
         /// <param name="token">Access token.</param>
         /// <returns><c>true</c> if access token was successfully set.</returns>
-        public async Task<bool> SetTokenAsync(int chatId, string token)
+        public async Task<bool> SetTokenAsync(long chatId, string token)
         {
             var success = await tokenStore.UpdateKeyAsync(chatId, token);
             if (success)
@@ -53,11 +53,11 @@ namespace CrmBot.Services
         /// Register information about chat being able to have an associated access token.
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
-        public async Task RegisterChatAsync(int chatId)
+        public async Task RegisterChatAsync(long chatId)
         {
             await tokenStore.RegisterChatAsync(chatId);
         }
 
-        private static string GetCacheKey(int primaryKey) => "AuthorizationToken-" + primaryKey;
+        private static string GetCacheKey(long primaryKey) => "AuthorizationToken-" + primaryKey;
     }
 }

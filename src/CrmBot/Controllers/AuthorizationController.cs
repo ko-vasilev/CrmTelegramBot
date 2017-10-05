@@ -21,7 +21,7 @@ namespace CrmBot.Controllers
         private readonly AuthorizationService authorizationService;
 
         [HttpPost("/authorize/{chatId}", Name = "Authorize_Token")]
-        public async Task<ActionResult> Authorize(int chatId, IFormCollection form)
+        public async Task<ActionResult> Authorize(long chatId, IFormCollection form)
         {
             var accessToken = form
                 .FirstOrDefault(param => param.Key == "access_token")

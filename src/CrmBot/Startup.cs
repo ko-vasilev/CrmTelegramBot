@@ -29,7 +29,7 @@ namespace CrmBot
             services.AddSingleton<TelegramBot>(serviceProvider =>
             {
                 var telegramBotKey = serviceProvider.GetService<AppSettings>().TelegramBotKey;
-                var bot = new TelegramBot(telegramBotKey);
+                var bot = new TelegramBot(telegramBotKey, serviceProvider.GetRequiredService<TelegramBotMessageHandler>());
                 bot.Activate();
                 return bot;
             });
@@ -40,6 +40,7 @@ namespace CrmBot
             });
             services.AddTransient<AuthenticationStoreService>();
             services.AddTransient<AuthorizationService>();
+            services.AddTransient<TelegramBotMessageHandler>();
             services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
 
             services.AddDataProtection();

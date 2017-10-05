@@ -12,7 +12,7 @@ namespace CrmBot.Models
             PartitionKey = string.Empty;
         }
 
-        public AuthenticationData(int chatId, string accessToken, string eTag = null)
+        public AuthenticationData(long chatId, string accessToken, string eTag = null)
             : this()
         {
             ChatId = chatId;
@@ -23,11 +23,11 @@ namespace CrmBot.Models
             }
         }
 
-        private int chatId;
+        private long chatId;
         /// <summary>
         /// Id of chat for which the access token was granted.
         /// </summary>
-        public int ChatId
+        public long ChatId
         {
             get
             {

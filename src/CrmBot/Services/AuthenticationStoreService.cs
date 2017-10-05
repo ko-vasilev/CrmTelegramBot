@@ -29,7 +29,7 @@ namespace CrmBot.Services
         /// </summary>
         /// <param name="chatId">Id of associated chat.</param>
         /// <returns>Authentication key info, or <c>null</c>.</returns>
-        public async Task<AuthenticationData> GetKeyAsync(int chatId)
+        public async Task<AuthenticationData> GetKeyAsync(long chatId)
         {
             var table = await GetStorageTable();
             var retrieveResult = await table.ExecuteAsync(TableOperation.Retrieve<AuthenticationData>("", chatId.ToString()));
@@ -48,7 +48,7 @@ namespace CrmBot.Services
         /// <param name="chatId">Id of the chat.</param>
         /// <param name="accessToken">Access token.</param>
         /// <returns><c>true</c> if update succeed.</returns>
-        public async Task<bool> UpdateKeyAsync(int chatId, string accessToken)
+        public async Task<bool> UpdateKeyAsync(long chatId, string accessToken)
         {
             var table = await GetStorageTable();
             var relatedEntity = await table.ExecuteAsync(TableOperation.Retrieve("", chatId.ToString()));
@@ -66,7 +66,7 @@ namespace CrmBot.Services
         /// Register information about chat being able to have an associated access token.
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
-        public async Task RegisterChatAsync(int chatId)
+        public async Task RegisterChatAsync(long chatId)
         {
             var table = await GetStorageTable();
             await table.ExecuteAsync(TableOperation.InsertOrMerge(new AuthenticationData(chatId, null)));

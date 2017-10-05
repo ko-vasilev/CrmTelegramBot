@@ -1,5 +1,4 @@
-﻿using CrmBot.Services;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -13,9 +12,12 @@ namespace CrmBot.Bot
 
         private readonly TelegramBotClient botClient;
 
-        public TelegramBot(string apiKey)
+        private readonly TelegramBotMessageHandler commandHandler;
+
+        public TelegramBot(string apiKey, TelegramBotMessageHandler commandHandler)
         {
             botClient = new TelegramBotClient(apiKey);
+            this.commandHandler = commandHandler;
         }
 
         public void Activate()
@@ -35,16 +37,15 @@ namespace CrmBot.Bot
             var currentChatId = e.Message.Chat.Id;
             await botClient.SendChatActionAsync(currentChatId, ChatAction.Typing);
 
-            await Task.Delay(TimeSpan.FromSeconds(2));
-
-            await botClient.SendTextMessageAsync(currentChatId, "Hello");
+            var result = await commandHandler.HandleMessage(currentChatId, e.Message.Text);
+            await botClient.SendTextMessageAsync(currentChatId, result.TextMessage, result.TextFormat, replyMarkup: result.AdditionalMarkup);
         }
 
         /// <summary>
         /// Notify client that the bot has acquired access token and now can interact with CRM.
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
-        public async Task NotifySuccessfulConnectionAsync(int chatId)
+        public async Task NotifySuccessfulConnectionAsync(long chatId)
         {
             await botClient.SendChatActionAsync(chatId, ChatAction.Typing);
             await botClient.SendTextMessageAsync(chatId, "Now you can access some of the CRM functionality from here.");
