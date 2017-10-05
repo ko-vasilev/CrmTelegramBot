@@ -28,7 +28,7 @@ namespace CrmBot
             services.AddSingleton<TelegramBot>(serviceProvider =>
             {
                 var telegramBotKey = serviceProvider.GetService<AppSettings>().TelegramBotKey;
-                var bot = new TelegramBot(telegramBotKey, serviceProvider.GetService<AuthorizationService>());
+                var bot = new TelegramBot(telegramBotKey);
                 bot.Activate();
                 return bot;
             });

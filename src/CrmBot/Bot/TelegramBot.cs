@@ -13,11 +13,8 @@ namespace CrmBot.Bot
 
         private readonly TelegramBotClient botClient;
 
-        private readonly AuthorizationService authorizationService;
-
-        public TelegramBot(string apiKey, AuthorizationService authorizationService)
+        public TelegramBot(string apiKey)
         {
-            this.authorizationService = authorizationService;
             botClient = new TelegramBotClient(apiKey);
         }
 
@@ -43,15 +40,14 @@ namespace CrmBot.Bot
             await botClient.SendTextMessageAsync(currentChatId, "Hello");
         }
 
-        public async Task<bool> SetChatAccessToken(int chatId, string accessToken)
+        /// <summary>
+        /// Notify client that the bot has acquired access token and now can interact with CRM.
+        /// </summary>
+        /// <param name="chatId">Id of the chat.</param>
+        public async Task NotifySuccessfulConnectionAsync(int chatId)
         {
-            var success = await authorizationService.SetTokenAsync(chatId, accessToken);
-            if (success)
-            {
-                await botClient.SendTextMessageAsync(chatId, "Now you can access some of the CRM functionality from here.");
-            }
-
-            return success;
+            await botClient.SendChatActionAsync(chatId, ChatAction.Typing);
+            await botClient.SendTextMessageAsync(chatId, "Now you can access some of the CRM functionality from here.");
         }
     }
 }
