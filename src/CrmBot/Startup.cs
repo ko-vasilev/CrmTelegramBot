@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
+using System;
 
 namespace CrmBot
 {
@@ -39,6 +40,7 @@ namespace CrmBot
             });
             services.AddTransient<AuthenticationStoreService>();
             services.AddTransient<AuthorizationService>();
+            services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
 
             services.AddDataProtection();
             services.AddMemoryCache();
