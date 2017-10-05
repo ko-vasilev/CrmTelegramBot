@@ -1,4 +1,4 @@
-﻿using CrmBot.Services;
+﻿using CrmBot.Bot;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -9,12 +9,12 @@ namespace CrmBot.Controllers
     [Produces("application/json")]
     public class AuthorizationController : Controller
     {
-        public AuthorizationController(AuthorizationService authorizationService)
+        public AuthorizationController(TelegramBot bot)
         {
-            this.authorizationService = authorizationService;
+            telegramBot = bot;
         }
 
-        private readonly AuthorizationService authorizationService;
+        private readonly TelegramBot telegramBot;
 
         [HttpPost("/authorize/{chatId}", Name = "Authorize_Token")]
         public async Task<ActionResult> Authorize(int chatId, IFormCollection form)
@@ -29,7 +29,7 @@ namespace CrmBot.Controllers
                 return BadRequest();
             }
 
-            var success = await authorizationService.SetTokenAsync(chatId, accessToken);
+            var success = await telegramBot.SetChatAccessToken(chatId, accessToken);
             if (!success)
             {
                 return BadRequest();

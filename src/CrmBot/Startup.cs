@@ -1,4 +1,5 @@
-﻿using CrmBot.Internal;
+﻿using CrmBot.Bot;
+using CrmBot.Internal;
 using CrmBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -27,7 +28,7 @@ namespace CrmBot
             services.AddSingleton<TelegramBot>(serviceProvider =>
             {
                 var telegramBotKey = serviceProvider.GetService<AppSettings>().TelegramBotKey;
-                var bot = new TelegramBot(telegramBotKey);
+                var bot = new TelegramBot(telegramBotKey, serviceProvider.GetService<AuthorizationService>());
                 bot.Activate();
                 return bot;
             });
