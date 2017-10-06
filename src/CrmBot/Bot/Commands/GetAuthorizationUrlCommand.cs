@@ -19,9 +19,13 @@ namespace CrmBot.Bot.Commands
         /// <inheritdoc />
         public async Task<CommandExecutionResult> HandleCommand()
         {
+            var authorizationUrl = AuthorizationService.Value.GenerateCrmAuthorizationUrl(ExecutionContext.ChatId);
+            await AuthorizationService.Value.RegisterChatAsync(ExecutionContext.ChatId);
             return new CommandExecutionResult
             {
-                TextMessage = "Hello"
+                TextMessage = @"
+Open this link to authorize the bot:
+" + authorizationUrl
             };
         }
     }

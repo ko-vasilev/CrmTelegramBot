@@ -62,6 +62,17 @@ namespace CrmBot.Bot
                 executionContext.Message = executionContext.Message.Substring(matchCommand.Length);
             }
 
+            if (commandName != string.Empty)
+            {
+                switch(commandName)
+                {
+                    case "start":
+                    case "connect":
+                        return new GetAuthorizationUrlCommand();
+                }
+            }
+
+            // TODO: implement handling "no suitable command" situations
             return new GetAuthorizationUrlCommand();
         }
     }

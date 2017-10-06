@@ -25,7 +25,6 @@ namespace CrmBot
         {
             AddSingletonFromFile<AppSettings>(services, Configuration.GetSection("AppSettings"));
             AddSingletonFromFile<StorageSettings>(services, Configuration.GetSection("StorageSettings"));
-
             services.AddSingleton<TelegramBot>(serviceProvider =>
             {
                 var telegramBotKey = serviceProvider.GetService<AppSettings>().TelegramBotKey;

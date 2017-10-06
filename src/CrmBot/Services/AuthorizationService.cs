@@ -1,19 +1,27 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using CrmBot.Internal;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Threading.Tasks;
 
 namespace CrmBot.Services
 {
     public class AuthorizationService
     {
-        public AuthorizationService(IMemoryCache memoryCache, AuthenticationStoreService tokenStoreService)
+        public AuthorizationService(
+            IMemoryCache memoryCache,
+            AuthenticationStoreService tokenStoreService,
+            AppSettings appSettings)
         {
             cache = memoryCache;
             tokenStore = tokenStoreService;
+            this.appSettings = appSettings;
         }
 
         private readonly IMemoryCache cache;
 
         private readonly AuthenticationStoreService tokenStore;
+
+        private readonly AppSettings appSettings;
 
         /// <summary>
         /// Get access token associated with the chat.
@@ -56,6 +64,19 @@ namespace CrmBot.Services
         public async Task RegisterChatAsync(long chatId)
         {
             await tokenStore.RegisterChatAsync(chatId);
+        }
+
+        /// <summary>
+        /// Get Url to be used to get the access token.
+        /// </summary>
+        /// <param name="chatId">Id of the chat to be authorized.</param>
+        /// <returns>Url.</returns>
+        public string GenerateCrmAuthorizationUrl(long chatId)
+        {
+            var callbackUri = $"{appSettings.AuthorizationCallbackUrl}/{chatId}";
+            var authorizationUrlBuilder = new UriBuilder(appSettings.CrmAuthorizationUrl);
+            authorizationUrlBuilder.Query = $"clientId={Uri.EscapeDataString(appSettings.CrmApplicationId)}&redirecturi={Uri.EscapeDataString(callbackUri)}";
+            return authorizationUrlBuilder.Uri.AbsoluteUri;
         }
 
         private static string GetCacheKey(long primaryKey) => "AuthorizationToken-" + primaryKey;
