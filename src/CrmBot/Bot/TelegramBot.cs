@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CrmBot.Bot.Commands;
+using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -48,7 +49,8 @@ namespace CrmBot.Bot
         public async Task NotifySuccessfulConnectionAsync(long chatId)
         {
             await botClient.SendChatActionAsync(chatId, ChatAction.Typing);
-            await botClient.SendTextMessageAsync(chatId, "Now you can access some of the CRM functionality from here.");
+            var result = await commandHandler.HandleMessage<NotifySuccessfulConnectionCommand>(chatId, string.Empty);
+            await botClient.SendTextMessageAsync(chatId, result.TextMessage, result.TextFormat, replyMarkup: result.AdditionalMarkup);
         }
     }
 }

@@ -40,6 +40,8 @@ namespace CrmBot
             services.AddTransient<AuthenticationStoreService>();
             services.AddTransient<AuthorizationService>();
             services.AddTransient<TelegramBotMessageHandler>();
+            services.AddSingleton<CrmClientService>();
+            services.AddTransient<CrmService>();
             services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
 
             services.AddDataProtection();

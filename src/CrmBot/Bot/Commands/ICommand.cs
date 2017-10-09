@@ -16,6 +16,11 @@ namespace CrmBot.Bot.Commands
         Lazy<AuthorizationService> AuthorizationService { set; }
 
         /// <summary>
+        /// Crm service.
+        /// </summary>
+        Lazy<CrmService> CrmService { set; }
+
+        /// <summary>
         /// Associated execution context.
         /// </summary>
         ExecutionContext ExecutionContext { set; }

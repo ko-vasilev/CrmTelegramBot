@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 namespace CrmBot.Bot.Commands
 {
     /// <summary>
-    /// Command for generating an authorization URL.
+    /// Command to notify user about successful authorization. As a side-effect, it will also reset used http client to make requests for the user/chat.
     /// </summary>
-    public class GetAuthorizationUrlCommand : ICommand
+    public class NotifySuccessfulConnectionCommand : ICommand
     {
         /// <inheritdoc />
         public Lazy<AuthorizationService> AuthorizationService { get; set; }
@@ -22,13 +22,13 @@ namespace CrmBot.Bot.Commands
         /// <inheritdoc />
         public async Task<CommandExecutionResult> HandleCommand()
         {
-            var authorizationUrl = CrmService.Value.GenerateCrmAuthorizationUrl(ExecutionContext.ChatId);
-            await AuthorizationService.Value.RegisterChatAsync(ExecutionContext.ChatId);
+            // TODO: better to handle this as event source.
+            CrmService.Value.ForgetClient(ExecutionContext.ChatId);
+            var me = await CrmService.Value.GetMeAsync(ExecutionContext.ChatId);
+
             return new CommandExecutionResult
             {
-                TextMessage = @"
-Open this link to authorize the bot:
-" + authorizationUrl
+                TextMessage = $"You were identified as {me.FirstName} {me.LastName}. Now you can access some of the CRM functionality from here."
             };
         }
     }

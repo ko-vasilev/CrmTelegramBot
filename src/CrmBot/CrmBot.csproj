@@ -19,4 +19,8 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\CrmDotnet\src\FarSaritasa\SaritasaApi\SaritasaApi.csproj" />
+  </ItemGroup>
+
 </Project>

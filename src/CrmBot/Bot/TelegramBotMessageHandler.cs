@@ -33,10 +33,30 @@ namespace CrmBot.Bot
         {
             var executionContext = new ExecutionContext(chatId, messageText);
             var command = GetAssociatedCommand(executionContext);
-            command.ExecutionContext = executionContext;
-            command.AuthorizationService = serviceProvider.GetService<Lazy<AuthorizationService>>();
+            SetupCommand(command, executionContext);
 
             return await command.HandleCommand();
+        }
+
+        /// <summary>
+        /// Handle message with a specific command.
+        /// </summary>
+        /// <typeparam name="T">Type of the command which should handle the message.</typeparam>
+        /// <param name="chatId">Id of the related chat.</param>
+        /// <param name="messageText">Text of the message.</param>
+        /// <returns>Result of the command execution.</returns>
+        public async Task<CommandExecutionResult> HandleMessage<T>(long chatId, string messageText) where T: class, ICommand, new()
+        {
+            var command = new T();
+            SetupCommand(command, new ExecutionContext(chatId, messageText));
+            return await command.HandleCommand();
+        }
+
+        private void SetupCommand(ICommand command, ExecutionContext executionContext)
+        {
+            command.ExecutionContext = executionContext;
+            command.AuthorizationService = serviceProvider.GetService<Lazy<AuthorizationService>>();
+            command.CrmService = serviceProvider.GetService<Lazy<CrmService>>();
         }
 
         /// <summary>
@@ -66,8 +86,8 @@ namespace CrmBot.Bot
             {
                 switch(commandName)
                 {
-                    case "start":
-                    case "connect":
+                    case CommandList.Start:
+                    case CommandList.Connect:
                         return new GetAuthorizationUrlCommand();
                 }
             }
