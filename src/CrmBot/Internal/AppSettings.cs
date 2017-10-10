@@ -13,6 +13,11 @@
         public string CrmAuthorizationUrl { get; set; }
 
         /// <summary>
+        /// URL of the CRM website.
+        /// </summary>
+        public string CrmUrl { get; set; }
+
+        /// <summary>
         /// Id of the current telegram bot registered in the CRM.
         /// </summary>
         public string CrmApplicationId { get; set; }

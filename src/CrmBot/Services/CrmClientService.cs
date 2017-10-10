@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using CrmBot.Internal;
+using Microsoft.Extensions.Caching.Memory;
 using SaritasaApi;
 using System.Threading.Tasks;
 
@@ -9,15 +10,21 @@ namespace CrmBot.Services
     /// </summary>
     public class CrmClientService
     {
-        public CrmClientService(IMemoryCache memoryCache, AuthorizationService authorizationService)
+        public CrmClientService(
+            IMemoryCache memoryCache,
+            AuthorizationService authorizationService,
+            AppSettings appSettings)
         {
             crmClientsCache = memoryCache;
             this.authorizationService = authorizationService;
+            this.appSettings = appSettings;
         }
 
         private readonly IMemoryCache crmClientsCache;
 
         private readonly AuthorizationService authorizationService;
+
+        private readonly AppSettings appSettings;
 
         /// <summary>
         /// Get a client connection associated with the chat.
@@ -29,7 +36,7 @@ namespace CrmBot.Services
             string cacheKey = GetCacheKey(chatId);
             return await crmClientsCache.GetOrCreateAsync(cacheKey, async entry =>
             {
-                var client = new Client("http://localhost:5555/");
+                var client = new Client(appSettings.CrmUrl);
                 var accessKey = await authorizationService.GetTokenAsync(chatId);
                 if (accessKey != null)
                 {
