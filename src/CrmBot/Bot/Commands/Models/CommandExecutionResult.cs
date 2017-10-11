@@ -8,6 +8,16 @@ namespace CrmBot.Bot.Commands.Models
     /// </summary>
     public class CommandExecutionResult
     {
+        public CommandExecutionResult()
+        {
+
+        }
+
+        public CommandExecutionResult(string message)
+        {
+            TextMessage = message;
+        }
+
         /// <summary>
         /// Text message.
         /// </summary>

@@ -57,13 +57,13 @@ namespace CrmBot.Services
             };
         }
 
-        public async Task CreateDailyReportAsync(long chatId, string text)
+        public async Task CreateDailyReportAsync(long chatId, string text, DateTime dailyReportDate)
         {
             var client = await clientService.GetClient(chatId);
             await client.UpdateDailyReportAsync(new SaritasaApi.Entities.DailyReport
             {
                 text = text,
-                date = DateTime.UtcNow
+                date = dailyReportDate
             });
         }
     }
