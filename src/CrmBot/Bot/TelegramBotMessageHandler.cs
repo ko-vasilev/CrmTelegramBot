@@ -1,6 +1,5 @@
 ﻿using CrmBot.Bot.Commands;
 using CrmBot.Bot.Commands.Models;
-using CrmBot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Text.RegularExpressions;
@@ -31,9 +30,8 @@ namespace CrmBot.Bot
         /// <returns>Result of the command execution.</returns>
         public async Task<CommandExecutionResult> HandleMessage(long chatId, string messageText)
         {
-            var executionContext = new ExecutionContext(chatId, messageText);
-            var command = GetAssociatedCommand(executionContext);
-            SetupCommand(command, executionContext);
+            var command = GetAssociatedCommand(chatId, messageText, out var commandContext);
+            command.CommandContext = commandContext;
 
             return await command.HandleCommand();
         }
@@ -45,18 +43,17 @@ namespace CrmBot.Bot
         /// <param name="chatId">Id of the related chat.</param>
         /// <param name="messageText">Text of the message.</param>
         /// <returns>Result of the command execution.</returns>
-        public async Task<CommandExecutionResult> HandleMessage<T>(long chatId, string messageText) where T: class, ICommand, new()
+        public async Task<CommandExecutionResult> HandleMessage<T>(long chatId, string messageText) where T: class, ICommand
         {
-            var command = new T();
-            SetupCommand(command, new ExecutionContext(chatId, messageText));
+            var command = serviceProvider.GetService<T>();
+            command.CommandContext = new CommandContext
+            {
+                ChatId = chatId,
+                Command = "",
+                Message = messageText,
+                RawMessage = messageText
+            };
             return await command.HandleCommand();
-        }
-
-        private void SetupCommand(ICommand command, ExecutionContext executionContext)
-        {
-            command.ExecutionContext = executionContext;
-            command.AuthorizationService = serviceProvider.GetService<Lazy<AuthorizationService>>();
-            command.CrmService = serviceProvider.GetService<Lazy<CrmService>>();
         }
 
         /// <summary>
@@ -67,11 +64,17 @@ namespace CrmBot.Bot
         /// <summary>
         /// Get a command which should handle the specified message.
         /// </summary>
-        /// <param name="executionContext">Associated execution context.</param>
+        /// <param name="commandContext">Associated command context.</param>
         /// <returns>Instance of a command which should handle the message.</returns>
-        private ICommand GetAssociatedCommand(ExecutionContext executionContext)
+        private ICommand GetAssociatedCommand(long chatId, string messageText, out CommandContext commandContext)
         {
-            var matchCommand = CommandNameRegex.Match(executionContext.Message);
+            commandContext = new CommandContext
+            {
+                ChatId = chatId,
+                Message = messageText,
+                RawMessage = messageText
+            };
+            var matchCommand = CommandNameRegex.Match(commandContext.Message);
             string commandName = string.Empty;
             if (matchCommand.Success)
             {
@@ -79,8 +82,9 @@ namespace CrmBot.Bot
                     .TrimEnd()
                     .Substring(1) // Omit the / symbol
                     .ToLowerInvariant();
-                executionContext.Message = executionContext.Message.Substring(matchCommand.Length);
+                commandContext.Message = commandContext.Message.Substring(matchCommand.Length);
             }
+            commandContext.Command = commandName;
 
             if (commandName != string.Empty)
             {
@@ -88,12 +92,12 @@ namespace CrmBot.Bot
                 {
                     case CommandList.Start:
                     case CommandList.Connect:
-                        return new GetAuthorizationUrlCommand();
+                        return serviceProvider.GetService<GetAuthorizationUrlCommand>();
                 }
             }
 
             // TODO: implement handling "no suitable command" situations
-            return new GetAuthorizationUrlCommand();
+            return serviceProvider.GetService<UpdateDailyReportCommand>();
         }
     }
 }

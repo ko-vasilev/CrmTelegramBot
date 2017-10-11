@@ -1,6 +1,5 @@
 ﻿using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
-using System;
 using System.Threading.Tasks;
 
 namespace CrmBot.Bot.Commands
@@ -10,21 +9,22 @@ namespace CrmBot.Bot.Commands
     /// </summary>
     public class NotifySuccessfulConnectionCommand : ICommand
     {
-        /// <inheritdoc />
-        public Lazy<AuthorizationService> AuthorizationService { get; set; }
+        public NotifySuccessfulConnectionCommand(CrmService crmService)
+        {
+            this.crmService = crmService;
+        }
+
+        private CrmService crmService;
 
         /// <inheritdoc />
-        public Lazy<CrmService> CrmService { get; set; }
-
-        /// <inheritdoc />
-        public ExecutionContext ExecutionContext { get; set; }
+        public CommandContext CommandContext { get; set; }
 
         /// <inheritdoc />
         public async Task<CommandExecutionResult> HandleCommand()
         {
             // TODO: better to handle this as event source.
-            CrmService.Value.ForgetClient(ExecutionContext.ChatId);
-            var me = await CrmService.Value.GetMeAsync(ExecutionContext.ChatId);
+            crmService.ForgetClient(CommandContext.ChatId);
+            var me = await crmService.GetMeAsync(CommandContext.ChatId);
 
             return new CommandExecutionResult
             {

@@ -1,6 +1,5 @@
 ﻿using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
-using System;
 using System.Threading.Tasks;
 
 namespace CrmBot.Bot.Commands
@@ -10,20 +9,26 @@ namespace CrmBot.Bot.Commands
     /// </summary>
     public class GetAuthorizationUrlCommand : ICommand
     {
-        /// <inheritdoc />
-        public Lazy<AuthorizationService> AuthorizationService { get; set; }
+        public GetAuthorizationUrlCommand(
+            CrmService crmService,
+            AuthorizationService authorizationService)
+        {
+            this.crmService = crmService;
+            this.authorizationService = authorizationService;
+        }
+
+        private AuthorizationService authorizationService;
+
+        private CrmService crmService;
 
         /// <inheritdoc />
-        public Lazy<CrmService> CrmService { get; set; }
-
-        /// <inheritdoc />
-        public ExecutionContext ExecutionContext { get; set; }
+        public CommandContext CommandContext { get; set; }
 
         /// <inheritdoc />
         public async Task<CommandExecutionResult> HandleCommand()
         {
-            var authorizationUrl = CrmService.Value.GenerateCrmAuthorizationUrl(ExecutionContext.ChatId);
-            await AuthorizationService.Value.RegisterChatAsync(ExecutionContext.ChatId);
+            var authorizationUrl = crmService.GenerateCrmAuthorizationUrl(CommandContext.ChatId);
+            await authorizationService.RegisterChatAsync(CommandContext.ChatId);
             return new CommandExecutionResult
             {
                 TextMessage = @"

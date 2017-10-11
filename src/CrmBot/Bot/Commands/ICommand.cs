@@ -11,19 +11,9 @@ namespace CrmBot.Bot.Commands
     public interface ICommand
     {
         /// <summary>
-        /// Authorization service.
-        /// </summary>
-        Lazy<AuthorizationService> AuthorizationService { set; }
-
-        /// <summary>
-        /// Crm service.
-        /// </summary>
-        Lazy<CrmService> CrmService { set; }
-
-        /// <summary>
         /// Associated execution context.
         /// </summary>
-        ExecutionContext ExecutionContext { set; }
+        CommandContext CommandContext { set; }
 
         /// <summary>
         /// Executes current command.

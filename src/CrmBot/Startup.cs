@@ -1,4 +1,5 @@
 ﻿using CrmBot.Bot;
+using CrmBot.Bot.Commands;
 using CrmBot.Internal;
 using CrmBot.Services;
 using Microsoft.AspNetCore.Builder;
@@ -43,6 +44,7 @@ namespace CrmBot
             services.AddSingleton<CrmClientService>();
             services.AddTransient<CrmService>();
             services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
+            AddCommands(services);
 
             services.AddDataProtection();
             services.AddMemoryCache();
@@ -71,6 +73,13 @@ namespace CrmBot
             //POCO is created with actual values
             TOptions options = configuration.Get<TOptions>();
             services.AddSingleton(options);
+        }
+
+        private void AddCommands(IServiceCollection services)
+        {
+            services.AddTransient<GetAuthorizationUrlCommand>();
+            services.AddTransient<NotifySuccessfulConnectionCommand>();
+            services.AddTransient<UpdateDailyReportCommand>();
         }
     }
 }

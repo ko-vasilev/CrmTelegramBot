@@ -3,22 +3,20 @@
     /// <summary>
     /// Command execution context.
     /// </summary>
-    public class ExecutionContext
+    public class CommandContext
     {
-        public ExecutionContext(long chatId, string message)
-        {
-            ChatId = chatId;
-            Message = message;
-        }
-
         /// <summary>
         /// Id of the chat.
         /// </summary>
-        public long ChatId { get; private set; }
+        public long ChatId { get; set; }
 
         /// <summary>
         /// Received message (excluding the command name itself).
         /// </summary>
         public string Message { get; set; }
+
+        public string Command { get; set; }
+
+        public string RawMessage { get; set; }
     }
 }
