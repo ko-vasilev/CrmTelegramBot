@@ -43,6 +43,7 @@ namespace CrmBot
             services.AddTransient<TelegramBotMessageHandler>();
             services.AddSingleton<CrmClientService>();
             services.AddTransient<CrmService>();
+            services.AddTransient<ConversationService>();
             services.AddTransient(typeof(Lazy<>), typeof(LazyService<>));
             AddCommands(services);
 

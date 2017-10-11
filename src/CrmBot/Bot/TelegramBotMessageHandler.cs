@@ -1,5 +1,6 @@
 ﻿using CrmBot.Bot.Commands;
 using CrmBot.Bot.Commands.Models;
+using CrmBot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Text.RegularExpressions;
@@ -15,12 +16,15 @@ namespace CrmBot.Bot
         /// <summary>
         /// .ctor
         /// </summary>
-        public TelegramBotMessageHandler(IServiceProvider serviceProvider)
+        public TelegramBotMessageHandler(IServiceProvider serviceProvider, ConversationService conversationService)
         {
             this.serviceProvider = serviceProvider;
+            this.conversationService = conversationService;
         }
 
         private readonly IServiceProvider serviceProvider;
+
+        private readonly ConversationService conversationService;
 
         /// <summary>
         /// Handle a chat message.
@@ -74,7 +78,7 @@ namespace CrmBot.Bot
                 Message = messageText,
                 RawMessage = messageText
             };
-            var matchCommand = CommandNameRegex.Match(commandContext.Message);
+            var matchCommand = CommandNameRegex.Match(messageText);
             string commandName = string.Empty;
             if (matchCommand.Success)
             {
@@ -82,9 +86,15 @@ namespace CrmBot.Bot
                     .TrimEnd()
                     .Substring(1) // Omit the / symbol
                     .ToLowerInvariant();
-                commandContext.Message = commandContext.Message.Substring(matchCommand.Length);
+                commandContext.Message = messageText.Substring(matchCommand.Length).Trim();
             }
             commandContext.Command = commandName;
+
+            var conversationContext = conversationService.GetAssociatedContext(chatId);
+            if (conversationContext.CurrentExecutingCommand != null)
+            {
+                return serviceProvider.GetService(conversationContext.CurrentExecutingCommand) as ICommand;
+            }
 
             if (commandName != string.Empty)
             {
