@@ -11,5 +11,10 @@ namespace CrmBot.Bot.Commands.Models
         /// Date of the daily report.
         /// </summary>
         public DateTime DailyReportDate { get; set; }
+
+        /// <summary>
+        /// Daily report message.
+        /// </summary>
+        public string Message { get; set; } = "";
     }
 }

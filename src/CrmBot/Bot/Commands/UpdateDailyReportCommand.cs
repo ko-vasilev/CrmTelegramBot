@@ -1,4 +1,5 @@
-﻿using CrmBot.Bot.Commands.Models;
+﻿using CrmBot.Bot.Commands.ExecutionResults;
+using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
 using System;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace CrmBot.Bot.Commands
 
         private const string CommandCancel = "cancel";
 
-        public async Task<CommandExecutionResult> HandleCommand()
+        public async Task<ICommandExecutionResult> HandleCommand()
         {
             var conversation = conversationService.GetAssociatedContext(CommandContext.ChatId);
 
@@ -41,7 +42,7 @@ namespace CrmBot.Bot.Commands
                     };
                     conversation.CurrentExecutingCommand = typeof(UpdateDailyReportCommand);
 
-                    return new CommandExecutionResult($"Creating a daily report for {date:D}. Please enter your daily report text.")
+                    return new TextResult($"Creating a daily report for {date:D}. Please enter your daily report text.")
                     {
                         AdditionalMarkup = new ReplyKeyboardMarkup(new[] { new KeyboardButton(CommandSubmit), new KeyboardButton(CommandCancel) })
                         {
@@ -51,20 +52,53 @@ namespace CrmBot.Bot.Commands
                 }
                 else
                 {
-                    return new CommandExecutionResult("Could not parse the date, please use MM/dd or MM/dd/yyyy format");
+                    return new TextResult("Could not parse the date, please use MM/dd or MM/dd/yyyy format.");
                 }
             }
+
             var data = conversation.ConversationData as DailyReportCommandData;
 
-            conversation.ConversationData = null;
-            conversation.CurrentExecutingCommand = null;
-            await crmService.CreateDailyReportAsync(CommandContext.ChatId, CommandContext.Message, data.DailyReportDate);
-
-            return new CommandExecutionResult()
+            if (CommandContext.RawMessage == CommandSubmit)
             {
-                TextMessage = "Success",
-                AdditionalMarkup = new ReplyKeyboardRemove()
-            };
+                if (string.IsNullOrEmpty(data.Message))
+                {
+                    return new TextResult("Daily report with empty message cannot be created.");
+                }
+
+                conversation.ConversationData = null;
+                conversation.CurrentExecutingCommand = null;
+
+                var success = await UpdateDailyReportAsync(data);
+                string resultMessage = success ? "Successfuly created daily report." : "Unexpected error occurred while updating the daily report.";
+                return new TextResult(resultMessage)
+                {
+                    AdditionalMarkup = new ReplyKeyboardRemove()
+                };
+            }
+
+            if (CommandContext.RawMessage == CommandCancel)
+            {
+                conversation.ConversationData = null;
+                conversation.CurrentExecutingCommand = null;
+                return new TextResult()
+                {
+                    TextMessage = "Daily report creation cancelled.",
+                    AdditionalMarkup = new ReplyKeyboardRemove()
+                };
+            }
+
+            if (!string.IsNullOrEmpty(data.Message))
+            {
+                data.Message += "\n";
+            }
+            data.Message += CommandContext.RawMessage;
+
+            return new EmptyResult();
+        }
+
+        private async Task<bool> UpdateDailyReportAsync(DailyReportCommandData dailyReport)
+        {
+            return await crmService.CreateDailyReportAsync(CommandContext.ChatId, dailyReport.Message, dailyReport.DailyReportDate);
         }
     }
 }

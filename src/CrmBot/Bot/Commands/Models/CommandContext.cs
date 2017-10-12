@@ -15,8 +15,14 @@
         /// </summary>
         public string Message { get; set; }
 
+        /// <summary>
+        /// Parsed command name.
+        /// </summary>
         public string Command { get; set; }
 
+        /// <summary>
+        /// Original message received from the user.
+        /// </summary>
         public string RawMessage { get; set; }
     }
 }
