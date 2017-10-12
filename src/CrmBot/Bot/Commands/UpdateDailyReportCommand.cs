@@ -2,6 +2,7 @@
 using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -98,7 +99,8 @@ namespace CrmBot.Bot.Commands
 
         private async Task<bool> UpdateDailyReportAsync(DailyReportCommandData dailyReport)
         {
-            return await crmService.CreateDailyReportAsync(CommandContext.ChatId, dailyReport.Message, dailyReport.DailyReportDate);
+            var supervisers = await crmService.GetSupervisersAsync(CommandContext.ChatId);
+            return await crmService.CreateDailyReportAsync(CommandContext.ChatId, dailyReport.Message, dailyReport.DailyReportDate, supervisers.Select(u => u.Id));
         }
     }
 }

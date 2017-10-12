@@ -1,6 +1,8 @@
 ﻿using CrmBot.Internal;
 using CrmBot.Models;
+using SaritasaApi.Entities;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CrmBot.Services
@@ -57,14 +59,34 @@ namespace CrmBot.Services
             };
         }
 
-        public async Task<bool> CreateDailyReportAsync(long chatId, string text, DateTime dailyReportDate)
+        /// <summary>
+        /// Creates a daily report.
+        /// </summary>
+        /// <param name="chatId">Id of the chat for which user the daily report should be created.</param>
+        /// <param name="text">Text of the daily report.</param>
+        /// <param name="dailyReportDate">Date of the daily report.</param>
+        /// <param name="notifyUserIds">Ids of users to be notified with e-mails.</param>
+        /// <returns><c>true</c> if daily report was successfully created.</returns>
+        public async Task<bool> CreateDailyReportAsync(long chatId, string text, DateTime dailyReportDate, IEnumerable<int> notifyUserIds)
         {
             var client = await clientService.GetClient(chatId);
-            return await client.UpdateDailyReportAsync(new SaritasaApi.Entities.DailyReport
+            return await client.UpdateDailyReportAsync(new DailyReport
             {
                 text = text,
-                date = dailyReportDate
+                date = dailyReportDate,
+                notifyUserIds = notifyUserIds
             });
+        }
+
+        /// <summary>
+        /// Get supervisors of a user associated with the chat.
+        /// </summary>
+        /// <param name="chatId">Chat id.</param>
+        /// <returns>List of supervisers.</returns>
+        public async Task<IEnumerable<User>> GetSupervisersAsync(long chatId)
+        {
+            var client = await clientService.GetClient(chatId);
+            return await client.GetMySupervisers();
         }
     }
 }
