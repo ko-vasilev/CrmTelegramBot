@@ -39,7 +39,7 @@ namespace CrmBot.Bot
             await botClient.SendChatActionAsync(currentChatId, ChatAction.Typing);
 
             var result = await commandHandler.HandleMessage(currentChatId, e.Message.Text);
-            await botClient.SendTextMessageAsync(currentChatId, result.TextMessage, result.TextFormat, replyMarkup: result.AdditionalMarkup);
+            await result.RenderResultAsync(botClient, currentChatId);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace CrmBot.Bot
         {
             await botClient.SendChatActionAsync(chatId, ChatAction.Typing);
             var result = await commandHandler.HandleMessage<NotifySuccessfulConnectionCommand>(chatId, string.Empty);
-            await botClient.SendTextMessageAsync(chatId, result.TextMessage, result.TextFormat, replyMarkup: result.AdditionalMarkup);
+            await result.RenderResultAsync(botClient, chatId);
         }
     }
 }

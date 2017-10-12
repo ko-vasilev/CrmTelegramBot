@@ -1,6 +1,5 @@
-﻿using CrmBot.Bot.Commands.Models;
-using CrmBot.Services;
-using System;
+﻿using CrmBot.Bot.Commands.ExecutionResults;
+using CrmBot.Bot.Commands.Models;
 using System.Threading.Tasks;
 
 namespace CrmBot.Bot.Commands
@@ -19,6 +18,6 @@ namespace CrmBot.Bot.Commands
         /// Executes current command.
         /// </summary>
         /// <returns>Result of command execution.</returns>
-        Task<CommandExecutionResult> HandleCommand();
+        Task<ICommandExecutionResult> HandleCommand();
     }
 }

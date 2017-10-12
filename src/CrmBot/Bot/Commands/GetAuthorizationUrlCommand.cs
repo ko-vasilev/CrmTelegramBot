@@ -1,4 +1,5 @@
-﻿using CrmBot.Bot.Commands.Models;
+﻿using CrmBot.Bot.Commands.ExecutionResults;
+using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
 using System.Threading.Tasks;
 
@@ -25,11 +26,11 @@ namespace CrmBot.Bot.Commands
         public CommandContext CommandContext { get; set; }
 
         /// <inheritdoc />
-        public async Task<CommandExecutionResult> HandleCommand()
+        public async Task<ICommandExecutionResult> HandleCommand()
         {
             var authorizationUrl = crmService.GenerateCrmAuthorizationUrl(CommandContext.ChatId);
             await authorizationService.RegisterChatAsync(CommandContext.ChatId);
-            return new CommandExecutionResult
+            return new TextResult
             {
                 TextMessage = @"
 Open this link to authorize the bot:

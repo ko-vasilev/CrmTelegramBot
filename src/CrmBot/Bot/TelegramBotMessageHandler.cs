@@ -1,4 +1,5 @@
 ﻿using CrmBot.Bot.Commands;
+using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ namespace CrmBot.Bot
         /// <param name="chatId">Id of the chat.</param>
         /// <param name="messageText">Text message.</param>
         /// <returns>Result of the command execution.</returns>
-        public async Task<CommandExecutionResult> HandleMessage(long chatId, string messageText)
+        public async Task<ICommandExecutionResult> HandleMessage(long chatId, string messageText)
         {
             var command = GetAssociatedCommand(chatId, messageText, out var commandContext);
             command.CommandContext = commandContext;
@@ -47,7 +48,7 @@ namespace CrmBot.Bot
         /// <param name="chatId">Id of the related chat.</param>
         /// <param name="messageText">Text of the message.</param>
         /// <returns>Result of the command execution.</returns>
-        public async Task<CommandExecutionResult> HandleMessage<T>(long chatId, string messageText) where T: class, ICommand
+        public async Task<ICommandExecutionResult> HandleMessage<T>(long chatId, string messageText) where T: class, ICommand
         {
             var command = serviceProvider.GetService<T>();
             command.CommandContext = new CommandContext

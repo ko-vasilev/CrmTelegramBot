@@ -1,4 +1,5 @@
-﻿using CrmBot.Bot.Commands.Models;
+﻿using CrmBot.Bot.Commands.ExecutionResults;
+using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
 using System.Threading.Tasks;
 
@@ -20,16 +21,13 @@ namespace CrmBot.Bot.Commands
         public CommandContext CommandContext { get; set; }
 
         /// <inheritdoc />
-        public async Task<CommandExecutionResult> HandleCommand()
+        public async Task<ICommandExecutionResult> HandleCommand()
         {
             // TODO: better to handle this as event source.
             crmService.ForgetClient(CommandContext.ChatId);
             var me = await crmService.GetMeAsync(CommandContext.ChatId);
 
-            return new CommandExecutionResult
-            {
-                TextMessage = $"You were identified as {me.FirstName} {me.LastName}. Now you can access some of the CRM functionality from here."
-            };
+            return new TextResult($"You were identified as {me.FirstName} {me.LastName}. Now you can access some of the CRM functionality from here.");
         }
     }
 }

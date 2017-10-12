@@ -1,19 +1,20 @@
-﻿using Telegram.Bot.Types.Enums;
+﻿using System.Threading.Tasks;
+using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace CrmBot.Bot.Commands.Models
+namespace CrmBot.Bot.Commands.ExecutionResults
 {
     /// <summary>
-    /// Result of a command execution.
+    /// Result represented as a text message.
     /// </summary>
-    public class CommandExecutionResult
+    public class TextResult : ICommandExecutionResult
     {
-        public CommandExecutionResult()
+        public TextResult()
         {
-
         }
 
-        public CommandExecutionResult(string message)
+        public TextResult(string message)
         {
             TextMessage = message;
         }
@@ -32,5 +33,11 @@ namespace CrmBot.Bot.Commands.Models
         /// Any additional markup which should be provided with the message.
         /// </summary>
         public IReplyMarkup AdditionalMarkup { get; set; }
+
+        /// <inheritdoc />
+        public async Task RenderResultAsync(TelegramBotClient bot, long chatId)
+        {
+            await bot.SendTextMessageAsync(chatId, TextMessage, TextFormat, replyMarkup: AdditionalMarkup);
+        }
     }
 }
