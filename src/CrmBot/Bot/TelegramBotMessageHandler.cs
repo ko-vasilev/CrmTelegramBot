@@ -104,11 +104,12 @@ namespace CrmBot.Bot
                     case CommandList.Start:
                     case CommandList.Connect:
                         return serviceProvider.GetService<GetAuthorizationUrlCommand>();
+                    case CommandList.DailyReport:
+                        return serviceProvider.GetService<UpdateDailyReportCommand>();
                 }
             }
 
-            // TODO: implement handling "no suitable command" situations
-            return serviceProvider.GetService<UpdateDailyReportCommand>();
+            return serviceProvider.GetService<NotifyUnknownCommandCommand>();
         }
     }
 }

@@ -81,6 +81,7 @@ namespace CrmBot
             services.AddTransient<GetAuthorizationUrlCommand>();
             services.AddTransient<NotifySuccessfulConnectionCommand>();
             services.AddTransient<UpdateDailyReportCommand>();
+            services.AddTransient<NotifyUnknownCommandCommand>();
         }
     }
 }
