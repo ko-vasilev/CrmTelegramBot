@@ -36,7 +36,6 @@ namespace CrmBot.Bot
         private async void BotClient_OnMessage(object sender, MessageEventArgs e)
         {
             var currentChatId = e.Message.Chat.Id;
-            await botClient.SendChatActionAsync(currentChatId, ChatAction.Typing);
 
             var result = await commandHandler.HandleMessage(currentChatId, e.Message.Text);
             await result.RenderResultAsync(botClient, currentChatId);

@@ -37,6 +37,7 @@ namespace CrmBot.Bot.Commands.ExecutionResults
         /// <inheritdoc />
         public async Task RenderResultAsync(TelegramBotClient bot, long chatId)
         {
+            await bot.SendChatActionAsync(chatId, ChatAction.Typing);
             await bot.SendTextMessageAsync(chatId, TextMessage, TextFormat, replyMarkup: AdditionalMarkup);
         }
     }
