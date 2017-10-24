@@ -82,6 +82,7 @@ namespace CrmBot
             services.AddTransient<NotifySuccessfulConnectionCommand>();
             services.AddTransient<UpdateDailyReportCommand>();
             services.AddTransient<NotifyUnknownCommandCommand>();
+            services.AddTransient<GetDayJobProgressCommand>();
         }
     }
 }

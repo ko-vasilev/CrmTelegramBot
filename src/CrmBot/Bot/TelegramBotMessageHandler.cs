@@ -38,7 +38,7 @@ namespace CrmBot.Bot
             var command = GetAssociatedCommand(chatId, messageText, out var commandContext);
             command.CommandContext = commandContext;
 
-            return await command.HandleCommand();
+            return await ExecuteCommand(command);
         }
 
         /// <summary>
@@ -58,7 +58,19 @@ namespace CrmBot.Bot
                 Message = messageText,
                 RawMessage = messageText
             };
-            return await command.HandleCommand();
+            return await ExecuteCommand(command);
+        }
+
+        private async Task<ICommandExecutionResult> ExecuteCommand(ICommand command)
+        {
+            try
+            {
+                return await command.HandleCommand();
+            }
+            catch (Exception ex)
+            {
+                return new ErrorResult(ex);
+            }
         }
 
         /// <summary>
@@ -99,13 +111,23 @@ namespace CrmBot.Bot
 
             if (commandName != string.Empty)
             {
+                Type commandType = null;
                 switch(commandName)
                 {
                     case CommandList.Start:
                     case CommandList.Connect:
-                        return serviceProvider.GetService<GetAuthorizationUrlCommand>();
+                        commandType = typeof(GetAuthorizationUrlCommand);
+                        break;
                     case CommandList.DailyReport:
-                        return serviceProvider.GetService<UpdateDailyReportCommand>();
+                        commandType = typeof(UpdateDailyReportCommand);
+                        break;
+                    case CommandList.Jobs:
+                        commandType = typeof(GetDayJobProgressCommand);
+                        break;
+                }
+                if (commandType != null)
+                {
+                    return serviceProvider.GetRequiredService(commandType) as ICommand;
                 }
             }
 

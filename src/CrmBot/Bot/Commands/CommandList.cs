@@ -10,5 +10,7 @@
         public const string Connect = "connect";
 
         public const string DailyReport = "dr";
+
+        public const string Jobs = "jobs";
     }
 }

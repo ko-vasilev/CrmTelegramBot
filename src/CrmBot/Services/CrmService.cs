@@ -89,5 +89,17 @@ namespace CrmBot.Services
             var client = await clientService.GetClient(chatId);
             return await client.GetMySupervisers();
         }
+
+        /// <summary>
+        /// Get list of user jobs for specified date.
+        /// </summary>
+        /// <param name="chatId">Id of the associated user chat.</param>
+        /// <param name="jobsDate">Date to search jobs for.</param>
+        /// <returns>List of matching jobs.</returns>
+        public async Task<List<Job>> GetJobsAsync(long chatId, DateTime jobsDate)
+        {
+            var client = await clientService.GetClient(chatId);
+            return await client.GetMyJobs(jobsDate);
+        }
     }
 }

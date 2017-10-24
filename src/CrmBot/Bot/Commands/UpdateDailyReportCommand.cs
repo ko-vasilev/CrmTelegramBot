@@ -1,7 +1,6 @@
 ﻿using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
@@ -35,17 +34,7 @@ namespace CrmBot.Bot.Commands
             // This is the first message, should contain date of the daily report
             if (conversation.CurrentExecutingCommand == null)
             {
-                DateTime date;
-                if (string.IsNullOrEmpty(CommandContext.Message))
-                {
-                    // Get "today" for current user
-                    var user = await crmService.GetUserAsync(CommandContext.ChatId);
-                    date = DateTime.UtcNow.AddHours(user.TimeZone);
-                }
-                else if (!DateTime.TryParse(CommandContext.Message, out date))
-                {
-                    return new TextResult("Could not parse the date, please use MM/dd or MM/dd/yyyy format.");
-                }
+                var date = await CommandUtils.ParseDateFromMessage(CommandContext, crmService);
                 conversation.ConversationData = new DailyReportCommandData
                 {
                     DailyReportDate = date
