@@ -49,13 +49,14 @@ namespace CrmBot.Services
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
         /// <returns>Information about user.</returns>
-        public async Task<UserModel> GetMeAsync(long chatId)
+        public async Task<UserModel> GetUserAsync(long chatId)
         {
             var client = await clientService.GetClient(chatId);
             return new UserModel()
             {
-                FirstName = client.FirstName,
-                LastName = client.LastName
+                FirstName = client.Me.FirstName,
+                LastName = client.Me.LastName,
+                TimeZone = client.Me.TimeZone
             };
         }
 

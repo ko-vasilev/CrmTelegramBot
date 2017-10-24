@@ -35,26 +35,30 @@ namespace CrmBot.Bot.Commands
             // This is the first message, should contain date of the daily report
             if (conversation.CurrentExecutingCommand == null)
             {
-                if (DateTime.TryParse(CommandContext.Message, out var date))
+                DateTime date;
+                if (string.IsNullOrEmpty(CommandContext.Message))
                 {
-                    conversation.ConversationData = new DailyReportCommandData
-                    {
-                        DailyReportDate = date
-                    };
-                    conversation.CurrentExecutingCommand = typeof(UpdateDailyReportCommand);
-
-                    return new TextResult($"Creating a daily report for {date:D}. Please enter your daily report text.")
-                    {
-                        AdditionalMarkup = new ReplyKeyboardMarkup(new[] { new KeyboardButton(CommandSubmit), new KeyboardButton(CommandCancel) })
-                        {
-                            ResizeKeyboard = true
-                        }
-                    };
+                    // Get "today" for current user
+                    var user = await crmService.GetUserAsync(CommandContext.ChatId);
+                    date = DateTime.UtcNow.AddHours(user.TimeZone);
                 }
-                else
+                else if (!DateTime.TryParse(CommandContext.Message, out date))
                 {
                     return new TextResult("Could not parse the date, please use MM/dd or MM/dd/yyyy format.");
                 }
+                conversation.ConversationData = new DailyReportCommandData
+                {
+                    DailyReportDate = date
+                };
+                conversation.CurrentExecutingCommand = typeof(UpdateDailyReportCommand);
+
+                return new TextResult($"Creating a daily report for {date:D}. Please enter your daily report text.")
+                {
+                    AdditionalMarkup = new ReplyKeyboardMarkup(new[] { new KeyboardButton(CommandSubmit), new KeyboardButton(CommandCancel) })
+                    {
+                        ResizeKeyboard = true
+                    }
+                };
             }
 
             var data = conversation.ConversationData as DailyReportCommandData;
