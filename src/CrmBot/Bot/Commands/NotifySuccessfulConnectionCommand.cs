@@ -25,7 +25,7 @@ namespace CrmBot.Bot.Commands
         {
             // TODO: better to handle this as event source.
             crmService.ForgetClient(CommandContext.ChatId);
-            var me = await crmService.GetMeAsync(CommandContext.ChatId);
+            var me = await crmService.GetUserAsync(CommandContext.ChatId);
 
             return new TextResult($"You were identified as {me.FirstName} {me.LastName}. Now you can access some of the CRM functionality from here.");
         }
