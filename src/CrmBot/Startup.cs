@@ -1,6 +1,8 @@
 ﻿using CrmBot.Bot;
 using CrmBot.Bot.Commands;
 using CrmBot.Internal;
+using CrmBot.Internal.Scheduling;
+using CrmBot.PeriodicTasks;
 using CrmBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -50,6 +52,15 @@ namespace CrmBot
             services.AddDataProtection();
             services.AddMemoryCache();
             services.AddMvc();
+
+            // Register scheduled tasks.
+            services.AddSingleton<IScheduledTask, CheckSubmittedDailyReportsTask>();
+            services.AddScheduler((sender, args) =>
+            {
+                // @TODO: add error handling logic
+                Console.Write(args.Exception.Message);
+                args.SetObserved();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
