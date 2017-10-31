@@ -8,7 +8,9 @@ namespace CrmBot.DataAccess.Models
     public class User
     {
         [Key]
-        public int UserId { get; set; }
+        public int Id { get; set; }
+
+        public int CrmUserId { get; set; }
 
         public string FirstName { get; set; }
 
@@ -16,6 +18,6 @@ namespace CrmBot.DataAccess.Models
 
         public int TimeZone { get; set; }
 
-        public List<TelegramChat> Chats { get; set; }
+        public TelegramChat Chat { get; set; }
     }
 }

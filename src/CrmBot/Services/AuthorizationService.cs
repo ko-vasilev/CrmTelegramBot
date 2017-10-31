@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using CrmBot.DataAccess.Services;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Caching.Memory;
+using System;
 using System.Threading.Tasks;
 
 namespace CrmBot.Services
@@ -7,15 +10,19 @@ namespace CrmBot.Services
     {
         public AuthorizationService(
             IMemoryCache memoryCache,
-            AuthenticationStoreService tokenStoreService)
+            TelegramChatService chatService,
+            IDataProtectionProvider dataProtectionProvider)
         {
             cache = memoryCache;
-            tokenStore = tokenStoreService;
+            this.chatService = chatService;
+            dataProtector = dataProtectionProvider.CreateProtector("AccessToken");
         }
 
         private readonly IMemoryCache cache;
 
-        private readonly AuthenticationStoreService tokenStore;
+        private readonly TelegramChatService chatService;
+
+        private readonly IDataProtector dataProtector;
 
         /// <summary>
         /// Get access token associated with the chat.
@@ -28,8 +35,8 @@ namespace CrmBot.Services
 
             var token = await cache.GetOrCreateAsync(key, async entry =>
             {
-                var keyEntry = await tokenStore.GetKeyAsync(chatId);
-                return keyEntry?.AccessToken;
+                var rawKey = await chatService.GetTokenAsync(chatId);
+                return dataProtector.Unprotect(rawKey);
             });
 
             return token;
@@ -41,23 +48,20 @@ namespace CrmBot.Services
         /// <param name="chatId">Id of the chat.</param>
         /// <param name="token">Access token.</param>
         /// <returns><c>true</c> if access token was successfully set.</returns>
-        public async Task<bool> SetTokenAsync(long chatId, string token)
+        public async Task SetTokenAsync(long chatId, Guid chatKey, string token)
         {
-            var success = await tokenStore.UpdateKeyAsync(chatId, token);
-            if (success)
-            {
-                cache.Set(GetCacheKey(chatId), token);
-            }
-            return success;
+            var protectedToken = dataProtector.Protect(token);
+            await chatService.SetTokenAsync(chatId, chatKey, protectedToken);
+            cache.Set(GetCacheKey(chatId), token);
         }
 
         /// <summary>
         /// Register information about chat being able to have an associated access token.
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
-        public async Task RegisterChatAsync(long chatId)
+        public async Task<Guid> RegisterChatAsync(long chatId)
         {
-            await tokenStore.RegisterChatAsync(chatId);
+            return await chatService.RegisterChatAsync(chatId);
         }
 
         private static string GetCacheKey(long primaryKey) => "AuthorizationToken-" + primaryKey;

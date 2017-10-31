@@ -11,53 +11,44 @@ using System;
 namespace CrmBot.DataAccess.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20171026120449_CoreTables")]
-    partial class CoreTables
+    partial class DatabaseContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("CrmBot.DataAccess.Models.CrmUserKey", b =>
+            modelBuilder.Entity("CrmBot.DataAccess.Models.TelegramChat", b =>
                 {
-                    b.Property<int>("KeyId")
-                        .ValueGeneratedOnAdd();
+                    b.Property<long>("ChatId");
 
                     b.Property<string>("AccessToken");
 
+                    b.Property<Guid>("SecureKey")
+                        .ValueGeneratedOnAdd();
+
                     b.Property<DateTime>("UpdatedDate")
                         .ValueGeneratedOnAddOrUpdate();
-
-                    b.Property<int>("UserId");
-
-                    b.HasKey("KeyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserKeys");
-                });
-
-            modelBuilder.Entity("CrmBot.DataAccess.Models.TelegramChat", b =>
-                {
-                    b.Property<int>("ChatId")
-                        .ValueGeneratedOnAdd();
 
                     b.Property<int?>("UserId");
 
                     b.HasKey("ChatId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("TelegramChats");
                 });
 
             modelBuilder.Entity("CrmBot.DataAccess.Models.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int>("CrmUserId");
 
                     b.Property<string>("FirstName");
 
@@ -65,24 +56,16 @@ namespace CrmBot.DataAccess.Migrations
 
                     b.Property<int>("TimeZone");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("CrmBot.DataAccess.Models.CrmUserKey", b =>
-                {
-                    b.HasOne("CrmBot.DataAccess.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("CrmBot.DataAccess.Models.TelegramChat", b =>
                 {
                     b.HasOne("CrmBot.DataAccess.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                        .WithOne("Chat")
+                        .HasForeignKey("CrmBot.DataAccess.Models.TelegramChat", "UserId");
                 });
 #pragma warning restore 612, 618
         }

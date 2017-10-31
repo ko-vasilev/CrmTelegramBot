@@ -28,8 +28,8 @@ namespace CrmBot.Bot.Commands
         /// <inheritdoc />
         public async Task<ICommandExecutionResult> HandleCommand()
         {
-            var authorizationUrl = crmService.GenerateCrmAuthorizationUrl(CommandContext.ChatId);
-            await authorizationService.RegisterChatAsync(CommandContext.ChatId);
+            var internalChatId = await authorizationService.RegisterChatAsync(CommandContext.ChatId);
+            var authorizationUrl = crmService.GenerateCrmAuthorizationUrl(CommandContext.ChatId, internalChatId);
             return new TextResult
             {
                 TextMessage = @"

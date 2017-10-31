@@ -26,12 +26,13 @@ namespace CrmBot.Services
         /// Get Url to be used to get the access token.
         /// </summary>
         /// <param name="chatId">Id of the chat to be authorized.</param>
+        /// <param name="internalChatId">Internal id of the chat to be used for validation.</param>
         /// <returns>Url.</returns>
-        public string GenerateCrmAuthorizationUrl(long chatId)
+        public string GenerateCrmAuthorizationUrl(long chatId, Guid internalChatId)
         {
             var callbackUri = $"{appSettings.AuthorizationCallbackUrl}/{chatId}";
             var authorizationUrlBuilder = new UriBuilder(appSettings.CrmAuthorizationUrl);
-            authorizationUrlBuilder.Query = $"clientId={Uri.EscapeDataString(appSettings.CrmApplicationId)}&redirecturi={Uri.EscapeDataString(callbackUri)}";
+            authorizationUrlBuilder.Query = $"clientId={Uri.EscapeDataString(appSettings.CrmApplicationId)}&state={internalChatId}&redirecturi={Uri.EscapeDataString(callbackUri)}";
             return authorizationUrlBuilder.Uri.AbsoluteUri;
         }
 
@@ -56,7 +57,8 @@ namespace CrmBot.Services
             {
                 FirstName = client.Me.FirstName,
                 LastName = client.Me.LastName,
-                TimeZone = client.Me.TimeZone
+                TimeZone = client.Me.TimeZone,
+                Id = client.Me.Id
             };
         }
 

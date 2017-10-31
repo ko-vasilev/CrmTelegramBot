@@ -5,14 +5,26 @@ namespace CrmBot.DataAccess
 {
     public class DatabaseContext : DbContext
     {
+        public DatabaseContext()
+            : base()
+        {
+        }
+
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Chat)
+                .WithOne(ch => ch.User)
+                .HasForeignKey<TelegramChat>(ch => ch.UserId);
+        }
 
-        public DbSet<CrmUserKey> UserKeys { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public DbSet<TelegramChat> TelegramChats { get; set; }
     }

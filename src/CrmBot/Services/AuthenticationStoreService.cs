@@ -9,12 +9,12 @@ namespace CrmBot.Services
     /// <summary>
     /// Manages persistent storage of authentication codes.
     /// </summary>
-    public class AuthenticationStoreService
+    public class AuthenticationStoreService2
     {
         /// <summary>
         /// .ctor
         /// </summary>
-        public AuthenticationStoreService(CloudStorageAccount storageAccount, IDataProtectionProvider dataProtectionProvider)
+        public AuthenticationStoreService2(CloudStorageAccount storageAccount, IDataProtectionProvider dataProtectionProvider)
         {
             this.storageAccount = storageAccount;
             dataProtector = dataProtectionProvider.CreateProtector("AccessToken");

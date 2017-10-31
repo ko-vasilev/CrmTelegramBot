@@ -1,6 +1,7 @@
 ﻿using CrmBot.Bot;
 using CrmBot.Bot.Commands;
 using CrmBot.DataAccess;
+using CrmBot.DataAccess.Services;
 using CrmBot.Internal;
 using CrmBot.Internal.Scheduling;
 using CrmBot.PeriodicTasks;
@@ -42,7 +43,6 @@ namespace CrmBot
                 var storageSettings = serviceProvider.GetService<StorageSettings>();
                 return new CloudStorageAccount(new StorageCredentials(storageSettings.AccountName, storageSettings.AccessKey), true);
             });
-            services.AddTransient<AuthenticationStoreService>();
             services.AddTransient<AuthorizationService>();
             services.AddTransient<TelegramBotMessageHandler>();
             services.AddSingleton<CrmClientService>();
@@ -56,7 +56,14 @@ namespace CrmBot
             services.AddMvc();
 
             string connectionString = Configuration["connectionString"];
-            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
+            services.AddSingleton<IAppUnitOfWorkFactory, AppUnitOfWorkFactory>(serviceProvider =>
+            {
+                var options = serviceProvider.GetService<DbContextOptions<DatabaseContext>>();
+                return new AppUnitOfWorkFactory(options);
+            });
+            services.AddTransient<TelegramChatService>();
+            services.AddTransient<UserService>();
 
             // Register scheduled tasks.
             services.AddSingleton<IScheduledTask, CheckSubmittedDailyReportsTask>();
