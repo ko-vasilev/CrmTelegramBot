@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using CrmBot.Services;
 using System.Diagnostics;
+using CrmBot.DataAccess;
 
 namespace CrmBot.Controllers
 {

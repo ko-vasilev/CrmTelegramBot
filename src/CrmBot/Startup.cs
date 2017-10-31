@@ -1,11 +1,13 @@
 ﻿using CrmBot.Bot;
 using CrmBot.Bot.Commands;
+using CrmBot.DataAccess;
 using CrmBot.Internal;
 using CrmBot.Internal.Scheduling;
 using CrmBot.PeriodicTasks;
 using CrmBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.WindowsAzure.Storage;
@@ -52,6 +54,9 @@ namespace CrmBot
             services.AddDataProtection();
             services.AddMemoryCache();
             services.AddMvc();
+
+            string connectionString = Configuration["connectionString"];
+            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString));
 
             // Register scheduled tasks.
             services.AddSingleton<IScheduledTask, CheckSubmittedDailyReportsTask>();

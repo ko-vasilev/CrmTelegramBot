@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrmBot", "CrmBot\CrmBot.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SaritasaApi", "..\..\CrmDotnet\src\FarSaritasa\SaritasaApi\SaritasaApi.csproj", "{83E414F4-ABA8-4013-B698-5BE46FDBFF5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrmBot.DataAccess", "CrmBot.DataAccess\CrmBot.DataAccess.csproj", "{B28A3427-CBFE-44CF-8632-57EE62C8C669}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{83E414F4-ABA8-4013-B698-5BE46FDBFF5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83E414F4-ABA8-4013-B698-5BE46FDBFF5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83E414F4-ABA8-4013-B698-5BE46FDBFF5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B28A3427-CBFE-44CF-8632-57EE62C8C669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B28A3427-CBFE-44CF-8632-57EE62C8C669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B28A3427-CBFE-44CF-8632-57EE62C8C669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B28A3427-CBFE-44CF-8632-57EE62C8C669}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

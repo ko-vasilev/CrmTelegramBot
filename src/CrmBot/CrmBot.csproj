@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\CrmDotnet\src\FarSaritasa\SaritasaApi\SaritasaApi.csproj" />
+    <ProjectReference Include="..\CrmBot.DataAccess\CrmBot.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>
