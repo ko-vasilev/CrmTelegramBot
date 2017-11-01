@@ -11,8 +11,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
 using System;
 
 namespace CrmBot
@@ -30,18 +28,12 @@ namespace CrmBot
         public void ConfigureServices(IServiceCollection services)
         {
             AddSingletonFromFile<AppSettings>(services, Configuration.GetSection("AppSettings"));
-            AddSingletonFromFile<StorageSettings>(services, Configuration.GetSection("StorageSettings"));
             services.AddSingleton<TelegramBot>(serviceProvider =>
             {
                 var telegramBotKey = serviceProvider.GetService<AppSettings>().TelegramBotKey;
                 var bot = new TelegramBot(telegramBotKey, serviceProvider.GetRequiredService<TelegramBotMessageHandler>());
                 bot.Activate();
                 return bot;
-            });
-            services.AddTransient(serviceProvider =>
-            {
-                var storageSettings = serviceProvider.GetService<StorageSettings>();
-                return new CloudStorageAccount(new StorageCredentials(storageSettings.AccountName, storageSettings.AccessKey), true);
             });
             services.AddTransient<AuthorizationService>();
             services.AddTransient<TelegramBotMessageHandler>();
