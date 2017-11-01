@@ -66,20 +66,21 @@ namespace CrmBot.DataAccess.Services
         /// <param name="chatId">Id of the chat.</param>
         public async Task<Guid> RegisterChatAsync(long chatId)
         {
+            TelegramChat chat;
             using (var database = uow.Create())
             {
-                var chat = await database.TelegramChats.FindAsync(chatId);
-                if (chat != null)
+                chat = await database.TelegramChats.FindAsync(chatId);
+                if (chat == null)
                 {
-                    return chat.SecureKey;
+                    var createdEntity = await database.TelegramChats.AddAsync(new TelegramChat()
+                    {
+                        ChatId = chatId
+                    });
+                    await database.SaveChangesAsync();
+                    chat = createdEntity.Entity;
                 }
-
-                var createdEntity = await database.TelegramChats.AddAsync(new TelegramChat()
-                {
-                    ChatId = chatId
-                });
-                return createdEntity.Entity.SecureKey;
             }
+            return chat.SecureKey;
         }
 
         /// <summary>

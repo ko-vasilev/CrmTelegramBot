@@ -27,7 +27,8 @@ namespace CrmBot.DataAccess.Migrations
                     b.Property<string>("AccessToken");
 
                     b.Property<Guid>("SecureKey")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("UpdatedDate")
                         .ValueGeneratedOnAddOrUpdate();

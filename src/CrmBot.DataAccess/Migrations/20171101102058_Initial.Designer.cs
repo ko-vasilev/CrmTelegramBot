@@ -11,7 +11,7 @@ using System;
 namespace CrmBot.DataAccess.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20171031111941_Initial")]
+    [Migration("20171101102058_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,7 +28,8 @@ namespace CrmBot.DataAccess.Migrations
                     b.Property<string>("AccessToken");
 
                     b.Property<Guid>("SecureKey")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValueSql("NEWID()");
 
                     b.Property<DateTime>("UpdatedDate")
                         .ValueGeneratedOnAddOrUpdate();

@@ -21,6 +21,7 @@ namespace CrmBot.DataAccess.Services
                 if (dbUser == null)
                 {
                     var insertedEntity = await databaseContext.Users.AddAsync(user);
+                    await databaseContext.SaveChangesAsync();
                     return insertedEntity.Entity.Id;
                 }
 

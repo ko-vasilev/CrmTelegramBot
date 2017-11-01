@@ -31,7 +31,7 @@ namespace CrmBot.DataAccess.Migrations
                 {
                     ChatId = table.Column<long>(type: "bigint", nullable: false),
                     AccessToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecureKey = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SecureKey = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "NEWID()"),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true)
                 },

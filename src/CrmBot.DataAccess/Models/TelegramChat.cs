@@ -23,7 +23,6 @@ namespace CrmBot.DataAccess.Models
 
         public string AccessToken { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedDate { get; set; }
     }
 }
