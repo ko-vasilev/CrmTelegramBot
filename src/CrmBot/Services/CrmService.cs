@@ -3,6 +3,7 @@ using CrmBot.Models;
 using SaritasaApi.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CrmBot.Services
@@ -58,7 +59,8 @@ namespace CrmBot.Services
                 FirstName = client.Me.FirstName,
                 LastName = client.Me.LastName,
                 TimeZone = client.Me.TimeZone,
-                Id = client.Me.Id
+                Id = client.Me.Id,
+                BranchId = client.Me.BranchId
             };
         }
 
@@ -102,6 +104,25 @@ namespace CrmBot.Services
         {
             var client = await clientService.GetClient(chatId);
             return await client.GetMyJobs(jobsDate);
+        }
+
+        public async Task<bool> DailyReportExists(long chatId, DateTime dailyReportDate)
+        {
+            var client = await clientService.GetClient(chatId);
+            var dailyReport = await client.GetMyDailyReports(dailyReportDate.Date, dailyReportDate.Date, 1);
+            return dailyReport.Count > 0;
+        }
+
+        public async Task<CalendarDay> GetDayInfo(long chatId, DateTime day)
+        {
+            var client = await clientService.GetClient(chatId);
+            return (await client.GetMyCalendar(day.Date, day.Date)).FirstOrDefault();
+        }
+
+        public async Task<List<BranchHoliday>> GetBranchHolidays(long chatId, DateTime from, DateTime to)
+        {
+            var client = await clientService.GetClient(chatId);
+            return await client.GetBranchHolidays(from.Date, to.Date);
         }
     }
 }

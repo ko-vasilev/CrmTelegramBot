@@ -1,4 +1,5 @@
 ﻿using CrmBot.Bot.Commands;
+using CrmBot.Bot.Commands.ExecutionResults;
 using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -50,6 +51,11 @@ namespace CrmBot.Bot
             await botClient.SendChatActionAsync(chatId, ChatAction.Typing);
             var result = await commandHandler.HandleMessage<NotifySuccessfulConnectionCommand>(chatId, string.Empty);
             await result.RenderResultAsync(botClient, chatId);
+        }
+
+        public async Task NotifyMissedDailyReportAsync(long chatId)
+        {
+            await new TextResult("You have not submitted a daily report yet!").RenderResultAsync(botClient, chatId);
         }
     }
 }

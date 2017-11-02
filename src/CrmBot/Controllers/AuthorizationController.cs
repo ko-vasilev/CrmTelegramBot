@@ -66,7 +66,8 @@ namespace CrmBot.Controllers
                 CrmUserId = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                TimeZone = user.TimeZone
+                TimeZone = user.TimeZone,
+                BranchId = user.BranchId
             });
             await telegramChatService.SetUserAsync(chatId, internalUserId);
             await telegramBot.NotifySuccessfulConnectionAsync(chatId);

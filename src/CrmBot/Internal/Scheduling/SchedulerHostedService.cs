@@ -65,6 +65,8 @@ namespace CrmBot.Internal.Scheduling
                         {
                             await task.Task.ExecuteAsync(cancellationToken);
                         }
+                        catch (OperationCanceledException)
+                        { }
                         catch (Exception ex)
                         {
                             var args = new UnobservedTaskExceptionEventArgs(
