@@ -56,6 +56,7 @@ namespace CrmBot
             });
             services.AddTransient<TelegramChatService>();
             services.AddTransient<UserService>();
+            services.AddTransient<NotificationSubscriptionService>();
 
             // Register scheduled tasks.
             services.AddSingleton<IScheduledTask, CheckSubmittedDailyReportsTask>();
@@ -98,6 +99,7 @@ namespace CrmBot
             services.AddTransient<UpdateDailyReportCommand>();
             services.AddTransient<NotifyUnknownCommandCommand>();
             services.AddTransient<GetDayJobProgressCommand>();
+            services.AddTransient<SubscribeDailyReportNotificationsCommand>();
         }
     }
 }

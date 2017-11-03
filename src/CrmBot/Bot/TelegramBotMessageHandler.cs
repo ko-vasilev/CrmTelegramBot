@@ -124,6 +124,9 @@ namespace CrmBot.Bot
                     case CommandList.Jobs:
                         commandType = typeof(GetDayJobProgressCommand);
                         break;
+                    case CommandList.DailyReportNotificationsSubscribe:
+                        commandType = typeof(SubscribeDailyReportNotificationsCommand);
+                        break;
                 }
                 if (commandType != null)
                 {

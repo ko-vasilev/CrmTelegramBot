@@ -12,5 +12,7 @@
         public const string DailyReport = "dr";
 
         public const string Jobs = "jobs";
+
+        public const string DailyReportNotificationsSubscribe = "subscribedr";
     }
 }

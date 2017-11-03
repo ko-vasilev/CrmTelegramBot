@@ -39,6 +39,8 @@ namespace CrmBot.DataAccess
 
         public DbSet<TelegramChat> TelegramChats { get; set; }
 
+        public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
+
         public override int SaveChanges()
         {
             UpdateAutomaticValues();
