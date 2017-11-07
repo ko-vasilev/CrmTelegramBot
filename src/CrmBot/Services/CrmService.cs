@@ -58,7 +58,7 @@ namespace CrmBot.Services
             {
                 FirstName = client.Me.FirstName,
                 LastName = client.Me.LastName,
-                TimeZone = client.Me.TimeZone,
+                TimeZoneCode = client.Me.TimeZoneCode,
                 Id = client.Me.Id,
                 BranchId = client.Me.BranchId
             };

@@ -23,7 +23,7 @@ namespace CrmBot.Bot.Commands
             {
                 // Get "today" for current user
                 var user = await crmService.GetUserAsync(commandContext.ChatId);
-                date = DateTime.UtcNow.AddHours(user.TimeZone);
+                date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById(user.TimeZoneCode));
             }
             else if (!DateTime.TryParse(commandContext.Message, out date))
             {

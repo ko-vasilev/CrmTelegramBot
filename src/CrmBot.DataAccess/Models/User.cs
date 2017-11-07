@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CrmBot.DataAccess.Models
 {
@@ -16,7 +13,7 @@ namespace CrmBot.DataAccess.Models
 
         public string LastName { get; set; }
 
-        public int TimeZone { get; set; }
+        public string TimeZoneCode { get; set; }
 
         public int BranchId { get; set; }
 

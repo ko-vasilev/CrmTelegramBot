@@ -27,7 +27,7 @@ namespace CrmBot.DataAccess.Services
 
                 dbUser.FirstName = user.FirstName;
                 dbUser.LastName = user.LastName;
-                dbUser.TimeZone = user.TimeZone;
+                dbUser.TimeZoneCode = user.TimeZoneCode;
                 await databaseContext.SaveChangesAsync();
                 return dbUser.Id;
             }

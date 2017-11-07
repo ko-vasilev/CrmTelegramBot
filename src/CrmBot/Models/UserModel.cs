@@ -11,7 +11,7 @@
 
         public string LastName { get; set; }
 
-        public int TimeZone { get; set; }
+        public string TimeZoneCode { get; set; }
 
         public int BranchId { get; set; }
     }
