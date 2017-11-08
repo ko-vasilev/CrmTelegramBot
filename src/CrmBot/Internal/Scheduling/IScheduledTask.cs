@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace CrmBot.Internal.Scheduling
@@ -10,9 +9,9 @@ namespace CrmBot.Internal.Scheduling
     public interface IScheduledTask
     {
         /// <summary>
-        /// How often should task be executed.
+        /// Task trigger schedule in Cron format.
         /// </summary>
-        TimeSpan RepeatFrequency { get; }
+        string Schedule { get; }
 
         /// <summary>
         /// Executes the task itself.

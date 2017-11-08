@@ -33,7 +33,7 @@ namespace CrmBot.PeriodicTasks
 
         private readonly NotificationSubscriptionService subscriptionService;
 
-        public TimeSpan RepeatFrequency => TimeSpan.FromHours(1);
+        public string Schedule => "0 * * * *"; // at the start of each hour
 
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {

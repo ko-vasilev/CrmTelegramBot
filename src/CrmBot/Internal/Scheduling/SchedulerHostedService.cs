@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NCrontab;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,7 +27,7 @@ namespace CrmBot.Internal.Scheduling
             {
                 this.scheduledTasks.Add(new SchedulerTaskWrapper
                 {
-                    RepeatFrequency = scheduledTask.RepeatFrequency,
+                    Schedule = CrontabSchedule.Parse(scheduledTask.Schedule),
                     Task = scheduledTask,
                     NextRunTime = referenceTime
                 });
@@ -89,7 +90,7 @@ namespace CrmBot.Internal.Scheduling
         /// </summary>
         private class SchedulerTaskWrapper
         {
-            public TimeSpan RepeatFrequency { get; set; }
+            public CrontabSchedule Schedule { get; set; }
 
             public IScheduledTask Task { get; set; }
 
@@ -103,7 +104,7 @@ namespace CrmBot.Internal.Scheduling
             public void Increment()
             {
                 LastRunTime = NextRunTime;
-                NextRunTime = NextRunTime + RepeatFrequency;
+                NextRunTime = Schedule.GetNextOccurrence(LastRunTime);
             }
 
             /// <summary>
