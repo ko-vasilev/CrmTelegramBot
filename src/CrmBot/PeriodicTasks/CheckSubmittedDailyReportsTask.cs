@@ -1,14 +1,13 @@
-﻿using CrmBot.Internal.Scheduling;
-using System;
-using System.Threading.Tasks;
-using System.Threading;
-using CrmBot.DataAccess;
-using System.Linq;
-using CrmBot.Services;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+﻿using CrmBot.Bot;
 using CrmBot.DataAccess.Models;
-using CrmBot.Bot;
+using CrmBot.DataAccess.Services;
+using CrmBot.Internal.Scheduling;
+using CrmBot.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BranchHoliday = SaritasaApi.Entities.BranchHoliday;
 
 namespace CrmBot.PeriodicTasks
@@ -18,46 +17,49 @@ namespace CrmBot.PeriodicTasks
     /// </summary>
     public class CheckSubmittedDailyReportsTask : IScheduledTask
     {
-        public CheckSubmittedDailyReportsTask(IAppUnitOfWorkFactory unitOfWork, CrmService crmService, TelegramBot telegramBot)
+        public CheckSubmittedDailyReportsTask(
+            CrmService crmService,
+            TelegramBot telegramBot,
+            NotificationSubscriptionService subscriptionService)
         {
-            uow = unitOfWork;
             this.crmService = crmService;
             this.telegramBot = telegramBot;
+            this.subscriptionService = subscriptionService;
         }
-
-        private readonly IAppUnitOfWorkFactory uow;
 
         private readonly CrmService crmService;
 
         private readonly TelegramBot telegramBot;
 
+        private readonly NotificationSubscriptionService subscriptionService;
+
         public TimeSpan RepeatFrequency => TimeSpan.FromHours(1);
 
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            List<TelegramChat> authorizedChats;
-            using (var database = uow.Create())
+            var checkStart = DateTime.UtcNow;
+            var pendingSubscriptions = await subscriptionService.GetPendingSubscriptions(checkStart, EventType.MissDailyReport);
+
+            foreach (var subscription in pendingSubscriptions)
             {
-                authorizedChats = await database.TelegramChats.Where(ch => ch.User != null && ch.AccessToken != null).ToListAsync();
-                foreach (var chat in authorizedChats)
-                {
-                    await database.Entry(chat).Reference(ch => ch.User).LoadAsync();
-                }
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-
-            foreach (var chat in authorizedChats)
-            {
-                // TODO: convert to user's local time
-                DateTime userCurrentDate = DateTime.Now;
-
-                var shouldSubmitDailyReport = await ShouldSubmitDailyReport(chat.User, userCurrentDate);
                 cancellationToken.ThrowIfCancellationRequested();
-                if (shouldSubmitDailyReport && !await crmService.DailyReportExists(chat.ChatId, userCurrentDate))
+
+                var user = subscription.User;
+                DateTime userCurrentDate = TimeZoneInfo.ConvertTimeFromUtc(checkStart, TimeZoneInfo.FindSystemTimeZoneById(user.TimeZoneCode));
+                // Do not notify user if notification time has not passed yet
+                if (userCurrentDate.Hour < subscription.CheckTime)
                 {
-                    await telegramBot.NotifyMissedDailyReportAsync(chat.ChatId);
+                    continue;
                 }
+
+                var shouldSubmitDailyReport = await ShouldSubmitDailyReport(user, userCurrentDate);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (shouldSubmitDailyReport && !await crmService.DailyReportExists(user.Chat.ChatId, userCurrentDate))
+                {
+                    await telegramBot.NotifyMissedDailyReportAsync(user.Chat.ChatId);
+                }
+                subscription.LastCheck = checkStart;
+                await subscriptionService.UpdateSubscription(subscription);
             }
         }
 

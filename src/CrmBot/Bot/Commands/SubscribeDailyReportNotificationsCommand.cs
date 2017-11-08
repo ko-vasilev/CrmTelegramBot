@@ -47,7 +47,7 @@ namespace CrmBot.Bot.Commands
                 currentUserId = chat.UserId.Value;
             }
 
-            await subscriptionService.NotificationsSubscribe(currentUserId, checkTime, DataAccess.Models.NotificationType.MissDailyReport);
+            await subscriptionService.NotificationsSubscribe(currentUserId, checkTime, DataAccess.Models.EventType.MissDailyReport);
             return new TextResult($"Now you will receive notifications if you miss daily report after {checkTime} o'clock (your local time)");
         }
     }
