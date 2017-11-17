@@ -128,6 +128,9 @@ namespace CrmBot.Bot
                     case CommandList.DailyReportNotificationsSubscribe:
                         commandType = typeof(SubscribeDailyReportNotificationsCommand);
                         break;
+                    case CommandList.Help:
+                        commandType = typeof(HelpCommand);
+                        break;
                 }
                 if (commandType != null)
                 {

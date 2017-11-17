@@ -100,6 +100,7 @@ namespace CrmBot
             services.AddTransient<NotifyUnknownCommandCommand>();
             services.AddTransient<GetDayJobProgressCommand>();
             services.AddTransient<SubscribeDailyReportNotificationsCommand>();
+            services.AddTransient<HelpCommand>();
         }
     }
 }

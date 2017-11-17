@@ -26,5 +26,10 @@
         /// Url to be used for callback when authorization succeeds in CRM.
         /// </summary>
         public string AuthorizationCallbackUrl { get; set; }
+
+        /// <summary>
+        /// Telegram Id of the user in charge for helping with the bot.
+        /// </summary>
+        public long HelpUserTelegramId { get; set; }
     }
 }
