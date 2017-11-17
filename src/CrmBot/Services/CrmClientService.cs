@@ -1,6 +1,8 @@
 ﻿using CrmBot.Internal;
+using CrmBot.Models;
 using Microsoft.Extensions.Caching.Memory;
 using SaritasaApi;
+using System;
 using System.Threading.Tasks;
 
 namespace CrmBot.Services
@@ -31,7 +33,7 @@ namespace CrmBot.Services
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
         /// <returns>CRM client to be used to make requests in context of specified chat.</returns>
-        public async Task<Client> GetClient(long chatId)
+        private async Task<Client> GetClient(long chatId)
         {
             string cacheKey = GetCacheKey(chatId);
             return await crmClientsCache.GetOrCreateAsync(cacheKey, async entry =>
@@ -45,6 +47,46 @@ namespace CrmBot.Services
                 }
                 return client;
             });
+        }
+
+        /// <summary>
+        /// Performs a call to CRM API.
+        /// </summary>
+        /// <typeparam name="T">Type of object to be returned.</typeparam>
+        /// <param name="chatId">Id of the related chat.</param>
+        /// <param name="action">Logic to be performed against the api client.</param>
+        public async Task<T> MakeApiCall<T>(long chatId, Func<Client, Task<T>> action)
+        {
+            try
+            {
+                var client = await GetClient(chatId);
+                return await action(client);
+            }
+            catch (UnauthorizedException ex)
+            {
+                await authorizationService.ClearTokenAsync(chatId);
+                crmClientsCache.Remove(GetCacheKey(chatId));
+
+                throw new UnauthorizedException("Access was rejected for the account. To continue, authorize the bot again in CRM.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets information about user associated with the chat.
+        /// </summary>
+        /// <param name="chatId">Id of the chat.</param>
+        /// <returns>Information about user.</returns>
+        public async Task<UserModel> GetUserAsync(long chatId)
+        {
+            var client = await GetClient(chatId);
+            return new UserModel()
+            {
+                FirstName = client.Me.FirstName,
+                LastName = client.Me.LastName,
+                TimeZoneCode = client.Me.TimeZoneCode,
+                Id = client.Me.Id,
+                BranchId = client.Me.BranchId
+            };
         }
 
         /// <summary>

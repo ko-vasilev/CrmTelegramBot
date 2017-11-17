@@ -44,22 +44,29 @@ namespace CrmBot.PeriodicTasks
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var user = subscription.User;
-                DateTime userCurrentDate = TimeZoneInfo.ConvertTimeFromUtc(checkStart, TimeZoneInfo.FindSystemTimeZoneById(user.TimeZoneCode));
-                // Do not notify user if notification time has not passed yet
-                if (userCurrentDate.Hour < subscription.CheckTime)
+                try
                 {
-                    continue;
-                }
+                    var user = subscription.User;
+                    DateTime userCurrentDate = TimeZoneInfo.ConvertTimeFromUtc(checkStart, TimeZoneInfo.FindSystemTimeZoneById(user.TimeZoneCode));
+                    // Do not notify user if notification time has not passed yet
+                    if (userCurrentDate.Hour < subscription.CheckTime)
+                    {
+                        continue;
+                    }
 
-                var shouldSubmitDailyReport = await ShouldSubmitDailyReport(user, userCurrentDate);
-                cancellationToken.ThrowIfCancellationRequested();
-                if (shouldSubmitDailyReport && !await crmService.DailyReportExists(user.Chat.ChatId, userCurrentDate))
-                {
-                    await telegramBot.NotifyMissedDailyReportAsync(user.Chat.ChatId);
+                    var shouldSubmitDailyReport = await ShouldSubmitDailyReport(user, userCurrentDate);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (shouldSubmitDailyReport && !await crmService.DailyReportExists(user.Chat.ChatId, userCurrentDate))
+                    {
+                        await telegramBot.NotifyMissedDailyReportAsync(user.Chat.ChatId);
+                    }
+                    subscription.LastCheck = checkStart;
+                    await subscriptionService.UpdateSubscription(subscription);
                 }
-                subscription.LastCheck = checkStart;
-                await subscriptionService.UpdateSubscription(subscription);
+                catch (Exception ex)
+                {
+                    // TODO: log exception
+                }
             }
         }
 

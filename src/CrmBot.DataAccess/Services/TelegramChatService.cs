@@ -102,5 +102,26 @@ namespace CrmBot.DataAccess.Services
                 await database.SaveChangesAsync();
             }
         }
+
+        /// <summary>
+        /// Clears access token associated with a chat.
+        /// </summary>
+        /// <param name="chatId">Id of chat which token should be cleared.</param>
+        public async Task ClearTokenAsync(long chatId)
+        {
+            using (var database = uow.Create())
+            {
+                var chat = await database.TelegramChats.FirstOrDefaultAsync(ch => ch.ChatId == chatId);
+                if (chat == null)
+                {
+                    throw new NotFoundException("Cannot find chat with id " + chatId);
+                }
+                if (chat.AccessToken != null)
+                {
+                    chat.AccessToken = null;
+                    await database.SaveChangesAsync();
+                }
+            }
+        }
     }
 }

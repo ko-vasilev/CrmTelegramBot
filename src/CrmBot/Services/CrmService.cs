@@ -51,17 +51,9 @@ namespace CrmBot.Services
         /// </summary>
         /// <param name="chatId">Id of the chat.</param>
         /// <returns>Information about user.</returns>
-        public async Task<UserModel> GetUserAsync(long chatId)
+        public Task<UserModel> GetUserAsync(long chatId)
         {
-            var client = await clientService.GetClient(chatId);
-            return new UserModel()
-            {
-                FirstName = client.Me.FirstName,
-                LastName = client.Me.LastName,
-                TimeZoneCode = client.Me.TimeZoneCode,
-                Id = client.Me.Id,
-                BranchId = client.Me.BranchId
-            };
+            return clientService.GetUserAsync(chatId);
         }
 
         /// <summary>
@@ -74,13 +66,13 @@ namespace CrmBot.Services
         /// <returns><c>true</c> if daily report was successfully created.</returns>
         public async Task<bool> CreateDailyReportAsync(long chatId, string text, DateTime dailyReportDate, IEnumerable<int> notifyUserIds)
         {
-            var client = await clientService.GetClient(chatId);
-            return await client.UpdateDailyReportAsync(new DailyReport
-            {
-                text = text,
-                date = dailyReportDate,
-                notifyUserIds = notifyUserIds
-            });
+            return await clientService.MakeApiCall(chatId,
+                async client => await client.UpdateDailyReportAsync(new DailyReport
+                {
+                    text = text,
+                    date = dailyReportDate,
+                    notifyUserIds = notifyUserIds
+                }));
         }
 
         /// <summary>
@@ -90,8 +82,8 @@ namespace CrmBot.Services
         /// <returns>List of supervisers.</returns>
         public async Task<IEnumerable<User>> GetSupervisersAsync(long chatId)
         {
-            var client = await clientService.GetClient(chatId);
-            return await client.GetMySupervisers();
+            return await clientService.MakeApiCall(chatId,
+                async client => await client.GetMySupervisers());
         }
 
         /// <summary>
@@ -102,27 +94,30 @@ namespace CrmBot.Services
         /// <returns>List of matching jobs.</returns>
         public async Task<List<Job>> GetJobsAsync(long chatId, DateTime jobsDate)
         {
-            var client = await clientService.GetClient(chatId);
-            return await client.GetMyJobs(jobsDate);
+            return await clientService.MakeApiCall(chatId,
+                async client => await client.GetMyJobs(jobsDate));
         }
 
         public async Task<bool> DailyReportExists(long chatId, DateTime dailyReportDate)
         {
-            var client = await clientService.GetClient(chatId);
-            var dailyReport = await client.GetMyDailyReports(dailyReportDate.Date, dailyReportDate.Date, 1);
-            return dailyReport.Count > 0;
+            return await clientService.MakeApiCall(chatId,
+                async client =>
+                {
+                    var dailyReport = await client.GetMyDailyReports(dailyReportDate.Date, dailyReportDate.Date, 1);
+                    return dailyReport.Count > 0;
+                });
         }
 
         public async Task<CalendarDay> GetDayInfo(long chatId, DateTime day)
         {
-            var client = await clientService.GetClient(chatId);
-            return (await client.GetMyCalendar(day.Date, day.Date)).FirstOrDefault();
+            return await clientService.MakeApiCall(chatId,
+                async client => (await client.GetMyCalendar(day.Date, day.Date)).FirstOrDefault());
         }
 
         public async Task<List<BranchHoliday>> GetBranchHolidays(long chatId, DateTime from, DateTime to)
         {
-            var client = await clientService.GetClient(chatId);
-            return await client.GetBranchHolidays(from.Date, to.Date);
+            return await clientService.MakeApiCall(chatId,
+               async client => await client.GetBranchHolidays(from.Date, to.Date));
         }
     }
 }

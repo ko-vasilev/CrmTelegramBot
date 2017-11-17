@@ -69,6 +69,7 @@ namespace CrmBot.Bot
             }
             catch (Exception ex)
             {
+                // TODO: log error.
                 return new ErrorResult(ex);
             }
         }

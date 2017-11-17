@@ -1,6 +1,7 @@
 ﻿using CrmBot.DataAccess.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Caching.Memory;
+using SaritasaApi;
 using System;
 using System.Threading.Tasks;
 
@@ -36,6 +37,10 @@ namespace CrmBot.Services
             var token = await cache.GetOrCreateAsync(key, async entry =>
             {
                 var rawKey = await chatService.GetTokenAsync(chatId);
+                if (rawKey == null)
+                {
+                    throw new UnauthorizedException();
+                }
                 return dataProtector.Unprotect(rawKey);
             });
 
@@ -62,6 +67,16 @@ namespace CrmBot.Services
         public async Task<Guid> RegisterChatAsync(long chatId)
         {
             return await chatService.RegisterChatAsync(chatId);
+        }
+
+        /// <summary>
+        /// Clears an access token for a chat.
+        /// </summary>
+        /// <param name="chatId">Id of the chat.</param>
+        public async Task ClearTokenAsync(long chatId)
+        {
+            await chatService.ClearTokenAsync(chatId);
+            cache.Remove(GetCacheKey(chatId));
         }
 
         private static string GetCacheKey(long primaryKey) => "AuthorizationToken-" + primaryKey;
