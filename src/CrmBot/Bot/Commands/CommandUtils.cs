@@ -1,5 +1,7 @@
 ﻿using CrmBot.Bot.Commands.Models;
-using CrmBot.Services;
+using CrmBot.DataAccess;
+using CrmBot.DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -14,15 +16,19 @@ namespace CrmBot.Bot.Commands
         /// Parse date from a command. If command text is empty, retrieves current date for associated user.
         /// </summary>
         /// <param name="commandContext">Command context.</param>
-        /// <param name="crmService">Crm service.</param>
+        /// <param name="uowFactory">Factory for creating database connections.</param>
         /// <returns>Parsed date.</returns>
-        public static async Task<DateTime> ParseDateFromMessage(CommandContext commandContext, CrmService crmService)
+        public static async Task<DateTime> ParseDateFromMessage(CommandContext commandContext, IAppUnitOfWorkFactory uowFactory)
         {
             DateTime date;
             if (string.IsNullOrEmpty(commandContext.Message))
             {
                 // Get "today" for current user
-                var user = await crmService.GetUserAsync(commandContext.ChatId);
+                User user;
+                using (var database = uowFactory.Create())
+                {
+                    user = await database.Users.FirstOrDefaultAsync(u => u.Chat.ChatId == commandContext.ChatId);
+                }
                 date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById(user.TimeZoneCode));
             }
             else if (!DateTime.TryParse(commandContext.Message, out date))

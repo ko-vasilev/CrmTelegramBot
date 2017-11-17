@@ -1,5 +1,6 @@
 ﻿using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
+using CrmBot.DataAccess;
 using CrmBot.Services;
 using System;
 using System.Linq;
@@ -13,18 +14,20 @@ namespace CrmBot.Bot.Commands
     /// </summary>
     public class GetDayJobProgressCommand : ICommand
     {
-        public GetDayJobProgressCommand(CrmService crmService)
+        public GetDayJobProgressCommand(CrmService crmService, IAppUnitOfWorkFactory uowFactory)
         {
             this.crmService = crmService;
+            this.uowFactory = uowFactory;
         }
 
         public CommandContext CommandContext { get; set; }
 
         private readonly CrmService crmService;
+        private readonly IAppUnitOfWorkFactory uowFactory;
 
         public async Task<ICommandExecutionResult> HandleCommand()
         {
-            var jobDate = await CommandUtils.ParseDateFromMessage(CommandContext, crmService);
+            var jobDate = await CommandUtils.ParseDateFromMessage(CommandContext, uowFactory);
             var jobs = await crmService.GetJobsAsync(CommandContext.ChatId, jobDate);
 
             var billable =

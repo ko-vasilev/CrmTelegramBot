@@ -60,6 +60,8 @@ namespace CrmBot.Controllers
             {
                 return BadRequest();
             }
+
+            crmService.ForgetClient(chatId);
             var user = await crmService.GetUserAsync(chatId);
             var internalUserId = await userService.UpsertAsync(new User()
             {

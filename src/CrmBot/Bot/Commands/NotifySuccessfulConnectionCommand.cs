@@ -1,6 +1,7 @@
 ﻿using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
-using CrmBot.Services;
+using CrmBot.DataAccess;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace CrmBot.Bot.Commands
@@ -10,12 +11,12 @@ namespace CrmBot.Bot.Commands
     /// </summary>
     public class NotifySuccessfulConnectionCommand : ICommand
     {
-        public NotifySuccessfulConnectionCommand(CrmService crmService)
+        public NotifySuccessfulConnectionCommand(IAppUnitOfWorkFactory uowFactory)
         {
-            this.crmService = crmService;
+            this.uowFactory = uowFactory;
         }
 
-        private CrmService crmService;
+        private readonly IAppUnitOfWorkFactory uowFactory;
 
         /// <inheritdoc />
         public CommandContext CommandContext { get; set; }
@@ -23,11 +24,11 @@ namespace CrmBot.Bot.Commands
         /// <inheritdoc />
         public async Task<ICommandExecutionResult> HandleCommand()
         {
-            // TODO: better to handle this as event source.
-            crmService.ForgetClient(CommandContext.ChatId);
-            var me = await crmService.GetUserAsync(CommandContext.ChatId);
-
-            return new TextResult($"You were identified as {me.FirstName} {me.LastName}. Now you can access some of the CRM functionality from here.");
+            using (var database = uowFactory.Create())
+            {
+                var me = await database.Users.FirstOrDefaultAsync(u => u.Chat.ChatId == CommandContext.ChatId);
+                return new TextResult($"You were identified as {me.FirstName} {me.LastName}. Now you can access some of the CRM functionality from here.");
+            }
         }
     }
 }

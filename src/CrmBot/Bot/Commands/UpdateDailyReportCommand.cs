@@ -1,5 +1,6 @@
 ﻿using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
+using CrmBot.DataAccess;
 using CrmBot.Services;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,18 +11,22 @@ namespace CrmBot.Bot.Commands
 {
     public class UpdateDailyReportCommand : ICommand
     {
-        public UpdateDailyReportCommand(CrmService crmService, ConversationService conversationService)
+        public UpdateDailyReportCommand(
+            CrmService crmService,
+            ConversationService conversationService,
+            IAppUnitOfWorkFactory uowFactory)
         {
             this.crmService = crmService;
             this.conversationService = conversationService;
+            this.uowFactory = uowFactory;
         }
 
         /// <inheritdoc />
         public CommandContext CommandContext { get; set; }
 
-        private CrmService crmService;
-
-        private ConversationService conversationService;
+        private readonly CrmService crmService;
+        private readonly ConversationService conversationService;
+        private readonly IAppUnitOfWorkFactory uowFactory;
 
         private const string CommandSubmit = "submit";
 
@@ -34,7 +39,7 @@ namespace CrmBot.Bot.Commands
             // This is the first message, should contain date of the daily report
             if (conversation.CurrentExecutingCommand == null)
             {
-                var date = await CommandUtils.ParseDateFromMessage(CommandContext, crmService);
+                var date = await CommandUtils.ParseDateFromMessage(CommandContext, uowFactory);
                 conversation.ConversationData = new DailyReportCommandData
                 {
                     DailyReportDate = date
