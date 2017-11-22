@@ -2,7 +2,9 @@
 using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
+using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,15 +19,18 @@ namespace CrmBot.Bot
         /// <summary>
         /// .ctor
         /// </summary>
-        public TelegramBotMessageHandler(IServiceProvider serviceProvider, ConversationService conversationService)
+        public TelegramBotMessageHandler(IServiceProvider serviceProvider, ConversationService conversationService, ILogger<TelegramBotMessageHandler> logger)
         {
             this.serviceProvider = serviceProvider;
             this.conversationService = conversationService;
+            this.logger = logger;
         }
 
         private readonly IServiceProvider serviceProvider;
 
         private readonly ConversationService conversationService;
+
+        private readonly ILogger logger;
 
         /// <summary>
         /// Handle a chat message.
@@ -69,7 +74,7 @@ namespace CrmBot.Bot
             }
             catch (Exception ex)
             {
-                // TODO: log error.
+                logger.LogError(ex, "Unhandled command execution error");
                 return new ErrorResult(ex);
             }
         }

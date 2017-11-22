@@ -6,6 +6,8 @@ using CrmBot.Internal;
 using CrmBot.Internal.Scheduling;
 using CrmBot.PeriodicTasks;
 using CrmBot.Services;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +48,11 @@ namespace CrmBot
             services.AddDataProtection();
             services.AddMemoryCache();
             services.AddMvc();
+            string appInsightsKey = Configuration.GetSection("ApplicationInsights")["InstrumentationKey"];
+            if (!string.IsNullOrEmpty(appInsightsKey))
+            {
+                services.AddApplicationInsightsTelemetry(appInsightsKey);
+            }
 
             string connectionString = Configuration["connectionString"];
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);
@@ -62,8 +69,7 @@ namespace CrmBot
             services.AddSingleton<IScheduledTask, CheckSubmittedDailyReportsTask>();
             services.AddScheduler((sender, args) =>
             {
-                // @TODO: add error handling logic
-                Console.Write(args.Exception.Message);
+                new TelemetryClient().TrackException(args.Exception);
                 args.SetObserved();
             });
         }
