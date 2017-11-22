@@ -3,8 +3,8 @@ using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
 using CrmBot.Services;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,18 +19,17 @@ namespace CrmBot.Bot
         /// <summary>
         /// .ctor
         /// </summary>
-        public TelegramBotMessageHandler(IServiceProvider serviceProvider, ConversationService conversationService, ILogger<TelegramBotMessageHandler> logger)
+        public TelegramBotMessageHandler(IServiceProvider serviceProvider, ConversationService conversationService)
         {
             this.serviceProvider = serviceProvider;
             this.conversationService = conversationService;
-            this.logger = logger;
         }
 
         private readonly IServiceProvider serviceProvider;
 
         private readonly ConversationService conversationService;
 
-        private readonly ILogger logger;
+        private TelemetryClient telemetry = new TelemetryClient();
 
         /// <summary>
         /// Handle a chat message.
@@ -68,14 +67,19 @@ namespace CrmBot.Bot
 
         private async Task<ICommandExecutionResult> ExecuteCommand(ICommand command)
         {
-            try
+            using (var operation = telemetry.StartOperation<RequestTelemetry>(command.GetType().Name))
             {
-                return await command.HandleCommand();
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Unhandled command execution error");
-                return new ErrorResult(ex);
+                operation.Telemetry.Context.Properties.Add("ChatId", command.CommandContext.ChatId.ToString());
+
+                try
+                {
+                    return await command.HandleCommand();
+                }
+                catch (Exception ex)
+                {
+                    telemetry.TrackException(ex);
+                    return new ErrorResult(ex);
+                }
             }
         }
 

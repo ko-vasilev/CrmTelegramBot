@@ -12,7 +12,7 @@ namespace CrmBot.Bot.Commands
         /// <summary>
         /// Associated execution context.
         /// </summary>
-        CommandContext CommandContext { set; }
+        CommandContext CommandContext { get; set; }
 
         /// <summary>
         /// Executes current command.
