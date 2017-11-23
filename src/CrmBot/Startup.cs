@@ -48,11 +48,13 @@ namespace CrmBot
             services.AddDataProtection();
             services.AddMemoryCache();
             services.AddMvc();
+
             string appInsightsKey = Configuration.GetSection("ApplicationInsights")["InstrumentationKey"];
             if (!string.IsNullOrEmpty(appInsightsKey))
             {
                 services.AddApplicationInsightsTelemetry(appInsightsKey);
             }
+            services.AddScoped<TelemetryClient>();
 
             string connectionString = Configuration["connectionString"];
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Singleton);

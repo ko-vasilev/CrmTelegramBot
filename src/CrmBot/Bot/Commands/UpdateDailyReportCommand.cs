@@ -2,6 +2,7 @@
 using CrmBot.Bot.Commands.Models;
 using CrmBot.DataAccess;
 using CrmBot.Services;
+using Microsoft.ApplicationInsights;
 using System.Linq;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
@@ -14,11 +15,13 @@ namespace CrmBot.Bot.Commands
         public UpdateDailyReportCommand(
             CrmService crmService,
             ConversationService conversationService,
-            IAppUnitOfWorkFactory uowFactory)
+            IAppUnitOfWorkFactory uowFactory,
+            TelemetryClient telemetry)
         {
             this.crmService = crmService;
             this.conversationService = conversationService;
             this.uowFactory = uowFactory;
+            this.telemetry = telemetry;
         }
 
         /// <inheritdoc />
@@ -27,6 +30,7 @@ namespace CrmBot.Bot.Commands
         private readonly CrmService crmService;
         private readonly ConversationService conversationService;
         private readonly IAppUnitOfWorkFactory uowFactory;
+        private readonly TelemetryClient telemetry;
 
         private const string CommandSubmit = "submit";
 
@@ -68,6 +72,7 @@ namespace CrmBot.Bot.Commands
                 conversation.CurrentExecutingCommand = null;
 
                 var success = await UpdateDailyReportAsync(data);
+                telemetry.TrackEvent("Daily report created");
                 string resultMessage = success ? "Successfuly created daily report." : "Unexpected error occurred while updating the daily report.";
                 return new TextResult(resultMessage)
                 {

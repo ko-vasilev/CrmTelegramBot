@@ -29,8 +29,6 @@ namespace CrmBot.Bot
 
         private readonly ConversationService conversationService;
 
-        private TelemetryClient telemetry = new TelemetryClient();
-
         /// <summary>
         /// Handle a chat message.
         /// </summary>
@@ -67,6 +65,7 @@ namespace CrmBot.Bot
 
         private async Task<ICommandExecutionResult> ExecuteCommand(ICommand command)
         {
+            var telemetry = serviceProvider.GetService<TelemetryClient>();
             using (var operation = telemetry.StartOperation<RequestTelemetry>(command.GetType().Name))
             {
                 operation.Telemetry.Context.Properties.Add("ChatId", command.CommandContext.ChatId.ToString());
