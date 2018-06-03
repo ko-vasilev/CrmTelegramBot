@@ -23,7 +23,7 @@ Task package -description 'Make publish package.' `
 {
     $args = @('publish',
               "$src\CrmBot\CrmBot.csproj",
-              '--output', "$workspace\CrmBot",
+              '--output', "$workspace\pub\CrmBot",
               '--configuration', $Configuration)
     $result = Start-Process -NoNewWindow -Wait -PassThru dotnet $args
     if ($result.ExitCode)
@@ -35,5 +35,5 @@ Task package -description 'Make publish package.' `
 Task publish -depends pre-publish, package, update-database -description 'Publish CrmBot project to remote server.' `
     -requiredVariables @('Configuration') `
 {
-    Invoke-WebSiteDeployment "$workspace\CrmBot" $ServerHost $SiteName -Application ''
+    Invoke-WebSiteDeployment "$workspace\pub\CrmBot" $ServerHost $SiteName -Application ''
 }
