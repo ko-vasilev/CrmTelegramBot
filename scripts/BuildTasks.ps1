@@ -22,11 +22,11 @@ Task build -depends pre-build -description '* Build solution.' `
 
 Task update-database -description '* Apply EF migrations to the database.' `
 {
+    Set-Location "$src\CrmBot.DataAccess"
     $args = @('ef',
               'database',
               'update',
               '--startup-project', "$src\CrmBot\CrmBot.csproj",
-              '--project', "$src\CrmBot.DataAccess\CrmBot.DataAccess.csproj",
               '--configuration', $Configuration)
     $result = Start-Process -NoNewWindow -Wait -PassThru dotnet $args
     if ($result.ExitCode)
