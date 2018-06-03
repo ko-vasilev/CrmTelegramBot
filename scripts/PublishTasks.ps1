@@ -22,8 +22,8 @@ Task package -description 'Make publish package.' `
     -requiredVariables @('Configuration') `
 {
     $args = @('publish',
-              "'$src\CrmBot\CrmBot.csproj'",
-              '--output', "'$workspace\CrmBot'",
+              "$src\CrmBot\CrmBot.csproj",
+              '--output', "$workspace\CrmBot",
               '--configuration', $Configuration)
     $result = Start-Process -NoNewWindow -Wait -PassThru dotnet $args
     if ($result.ExitCode)
