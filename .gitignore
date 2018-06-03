@@ -288,4 +288,4 @@ __pycache__/
 *.xsd.cs
 
 # Development config overrides
-appsettings.Development.json
+src/CrmBot/appsettings.*.json
