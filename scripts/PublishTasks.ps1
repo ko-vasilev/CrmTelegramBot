@@ -21,13 +21,19 @@ Task pre-publish -depends build -description 'Set common publish settings.' `
 Task package -description 'Make publish package.' `
     -requiredVariables @('Configuration') `
 {
-    Invoke-PackageBuild "$src\CrmBot\CrmBot.csproj" "$workspace\CrmBot.zip" $Configuration -Precompile $false
+    $args = @('publish',
+              "'$src\CrmBot\CrmBot.csproj'",
+              '--project', "'$workspace\CrmBot'",
+              '--configuration', $Configuration)
+    $result = Start-Process -NoNewWindow -Wait -PassThru dotnet $args
+    if ($result.ExitCode)
+    {
+        throw 'Project publish failed.'
+    }
 }
 
 Task publish -depends pre-publish, package, update-database -description 'Publish CrmBot project to remote server.' `
     -requiredVariables @('Configuration') `
 {
-    $msdeployParams = @(
-    )
-    Invoke-WebDeployment "$workspace\CrmBot.zip" $ServerHost $SiteName -Application '' -MSDeployParams $msdeployParams
+    Invoke-WebSiteDeployment "$workspace\CrmBot" $ServerHost $SiteName -Application ''
 }
