@@ -23,6 +23,7 @@ Task build -depends pre-build -description '* Build solution.' `
 Task update-database -description '* Apply EF migrations to the database.' `
 {
     Set-Location "$src\CrmBot.DataAccess"
+    $env:ASPNETCORE_ENVIRONMENT = $Configuration
     $args = @('ef',
               'database',
               'update',
