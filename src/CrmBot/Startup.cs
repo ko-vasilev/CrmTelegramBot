@@ -10,10 +10,12 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 
 namespace CrmBot
 {
@@ -47,7 +49,12 @@ namespace CrmBot
 
             services.AddDataProtection();
             services.AddMemoryCache();
-            services.AddMvc();
+            services.AddMvc() // Fix compilation error if referencing NetStandard2.0 assemblies
+                .ConfigureApplicationPartManager(manager =>
+                {
+                    manager.FeatureProviders.Remove(manager.FeatureProviders.First(f => f is MetadataReferenceFeatureProvider));
+                    manager.FeatureProviders.Add(new ReferencesMetadataReferenceFeatureProvider());
+                });
 
             string appInsightsKey = Configuration.GetSection("ApplicationInsights")["InstrumentationKey"];
             if (!string.IsNullOrEmpty(appInsightsKey))
