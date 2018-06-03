@@ -5,7 +5,6 @@ Properties `
 
 $root = $PSScriptRoot
 $src = Resolve-Path "$root\..\src"
-$lib = Resolve-Path "$root\..\lib"
 
 Import-Module Saritasa.Build
 
