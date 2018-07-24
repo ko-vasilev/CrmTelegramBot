@@ -13,6 +13,7 @@ Task pre-build `
     Initialize-MSBuild
     Invoke-NugetRestore -SolutionPath "$src\CrmBot.sln"
 
+    Set-Location $src
     $args = @('restore')
     $result = Start-Process -NoNewWindow -Wait -PassThru dotnet $args
     if ($result.ExitCode)
