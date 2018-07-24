@@ -76,5 +76,11 @@ namespace CrmBot.Controllers
 
             return Ok();
         }
+
+        [HttpGet("/ping")]
+        public ActionResult Ping()
+        {
+            return Ok("pong");
+        }
     }
 }
