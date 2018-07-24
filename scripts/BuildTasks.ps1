@@ -12,6 +12,13 @@ Task pre-build `
 {
     Initialize-MSBuild
     Invoke-NugetRestore -SolutionPath "$src\CrmBot.sln"
+
+    $args = @('restore')
+    $result = Start-Process -NoNewWindow -Wait -PassThru dotnet $args
+    if ($result.ExitCode)
+    {
+        throw 'dotnet restore failed.'
+    }
 }
 
 Task build -depends pre-build -description '* Build solution.' `
