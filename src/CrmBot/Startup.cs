@@ -49,12 +49,7 @@ namespace CrmBot
 
             services.AddDataProtection();
             services.AddMemoryCache();
-            services.AddMvc() // Fix compilation error if referencing NetStandard2.0 assemblies
-                .ConfigureApplicationPartManager(manager =>
-                {
-                    manager.FeatureProviders.Remove(manager.FeatureProviders.First(f => f is MetadataReferenceFeatureProvider));
-                    manager.FeatureProviders.Add(new ReferencesMetadataReferenceFeatureProvider());
-                });
+            services.AddMvc(); // Fix compilation error if referencing NetStandard2.0 assemblies
 
             string appInsightsKey = Configuration.GetSection("ApplicationInsights")["InstrumentationKey"];
             if (!string.IsNullOrEmpty(appInsightsKey))
