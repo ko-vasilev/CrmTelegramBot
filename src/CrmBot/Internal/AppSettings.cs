@@ -8,6 +8,16 @@
         public string TelegramBotKey { get; set; }
 
         /// <summary>
+        /// Address of the proxy to use for Telegram connections.
+        /// </summary>
+        public string TelegramProxyAddress { get; set; }
+
+        /// <summary>
+        /// Proxy port number to use for Telegram connections.
+        /// </summary>
+        public int? TelegramProxyPort { get; set; }
+
+        /// <summary>
         /// CRM url used to authorize the telegram bot.
         /// </summary>
         public string CrmAuthorizationUrl { get; set; }

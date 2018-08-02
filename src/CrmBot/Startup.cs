@@ -7,16 +7,14 @@ using CrmBot.Internal.Scheduling;
 using CrmBot.PeriodicTasks;
 using CrmBot.Services;
 using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
+using System.Net;
 
 namespace CrmBot
 {
@@ -35,8 +33,15 @@ namespace CrmBot
             AddSingletonFromFile<AppSettings>(services, Configuration.GetSection("AppSettings"));
             services.AddSingleton<TelegramBot>(serviceProvider =>
             {
-                var telegramBotKey = serviceProvider.GetService<AppSettings>().TelegramBotKey;
-                var bot = new TelegramBot(telegramBotKey, serviceProvider.GetRequiredService<TelegramBotMessageHandler>());
+                var appSettings = serviceProvider.GetService<AppSettings>();
+                var telegramBotKey = appSettings.TelegramBotKey;
+                WebProxy proxy = null;
+                if (!string.IsNullOrEmpty(appSettings.TelegramProxyAddress) && appSettings.TelegramProxyPort.HasValue)
+                {
+                    proxy = new WebProxy(appSettings.TelegramProxyAddress, appSettings.TelegramProxyPort.Value);
+                    proxy.BypassProxyOnLocal = false;
+                }
+                var bot = new TelegramBot(telegramBotKey, serviceProvider.GetRequiredService<TelegramBotMessageHandler>(), proxy);
                 bot.Activate();
                 return bot;
             });
