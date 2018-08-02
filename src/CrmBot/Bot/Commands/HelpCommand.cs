@@ -27,6 +27,7 @@ namespace CrmBot.Bot.Commands
 $@"List of available commands:
 /{CommandList.DailyReport} `date` - Start creating a daily report. After submitting the command, start entering a daily report text. Multiple messages are supported
 /{CommandList.Jobs} `date` - Get jobs summary for a day
+/{CommandList.JobsList} `date` - Get list of jobs for a day
 /{CommandList.DailyReportNotificationsSubscribe} `hour`_(default: 21)_ - Subscribe for daily report notifications. After the `hour` if you have not submitted a daily report (but should have), you will receive a notification
 /{CommandList.Connect} - Generate a link from which you can authorize the bot in CRM
 
