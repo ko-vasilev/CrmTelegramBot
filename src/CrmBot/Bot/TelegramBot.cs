@@ -30,7 +30,7 @@ namespace CrmBot.Bot
             }
 
             botClient.OnMessage += BotClient_OnMessage;
-            botClient.StartReceiving(new[] { UpdateType.MessageUpdate });
+            botClient.StartReceiving(new[] { UpdateType.Message });
             IsActivated = true;
         }
 
