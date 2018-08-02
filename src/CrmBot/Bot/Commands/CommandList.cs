@@ -15,6 +15,8 @@
 
         public const string DailyReportNotificationsSubscribe = "subscribedr";
 
+        public const string JobsList = "joblist";
+
         public const string Help = "help";
     }
 }
