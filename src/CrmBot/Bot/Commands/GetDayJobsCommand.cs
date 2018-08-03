@@ -33,19 +33,19 @@ namespace CrmBot.Bot.Commands
 
             var jobsList = new StringBuilder();
 
-            var totalDuration = jobs
-                .Select(j => j.duration)
-                .DefaultIfEmpty(0)
-                .Sum();
-            jobsList.AppendLine();
-            jobsList.AppendFormat("Total: *{0}*", ToTime(totalDuration));
-
             foreach (var job in jobs.OrderBy(j => j.jobID))
             {
                 jobsList.AppendLine();
                 jobsList.AppendFormat(@"*{0}* ```
 {1}```", ToTime(job.duration), job.text);
             }
+
+            var totalDuration = jobs
+                .Select(j => j.duration)
+                .DefaultIfEmpty(0)
+                .Sum();
+            jobsList.AppendLine();
+            jobsList.AppendFormat("Total: *{0}*", ToTime(totalDuration));
 
             return new TextResult($@"Jobs for {jobDate:D}" + jobsList.ToString())
             {
