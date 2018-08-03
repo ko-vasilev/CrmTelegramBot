@@ -32,6 +32,14 @@ namespace CrmBot.Bot.Commands
             var jobs = await crmService.GetJobsAsync(CommandContext.ChatId, jobDate);
 
             var jobsList = new StringBuilder();
+
+            var totalDuration = jobs
+                .Select(j => j.duration)
+                .DefaultIfEmpty(0)
+                .Sum();
+            jobsList.AppendLine();
+            jobsList.AppendFormat("Total: *{0}*", ToTime(totalDuration));
+
             foreach (var job in jobs.OrderBy(j => j.jobID))
             {
                 jobsList.AppendLine();
