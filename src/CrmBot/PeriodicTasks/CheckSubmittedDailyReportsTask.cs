@@ -37,6 +37,8 @@ namespace CrmBot.PeriodicTasks
 
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            // Clear branch holidays info cache
+            branchHolidays = null;
             var checkStart = DateTime.UtcNow;
             var pendingSubscriptions = await subscriptionService.GetPendingSubscriptions(checkStart, EventType.MissDailyReport);
 

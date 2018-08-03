@@ -1,6 +1,7 @@
 ﻿using CrmBot.Bot.Commands;
 using CrmBot.Bot.Commands.ExecutionResults;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -16,9 +17,9 @@ namespace CrmBot.Bot
 
         private readonly TelegramBotMessageHandler commandHandler;
 
-        public TelegramBot(string apiKey, TelegramBotMessageHandler commandHandler)
+        public TelegramBot(string apiKey, TelegramBotMessageHandler commandHandler, IWebProxy proxy)
         {
-            botClient = new TelegramBotClient(apiKey);
+            botClient = new TelegramBotClient(apiKey, proxy);
             this.commandHandler = commandHandler;
         }
 
@@ -30,7 +31,7 @@ namespace CrmBot.Bot
             }
 
             botClient.OnMessage += BotClient_OnMessage;
-            botClient.StartReceiving(new[] { UpdateType.MessageUpdate });
+            botClient.StartReceiving(new[] { UpdateType.Message });
             IsActivated = true;
         }
 
@@ -38,7 +39,7 @@ namespace CrmBot.Bot
         {
             var currentChatId = e.Message.Chat.Id;
 
-            var result = await commandHandler.HandleMessage(currentChatId, e.Message.Text);
+            var result = await commandHandler.HandleMessage(e.Message.From.Id, currentChatId, e.Message.Text);
             await result.RenderResultAsync(botClient, currentChatId);
         }
 

@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Saritasa.Tools.Domain.Exceptions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CrmBot.DataAccess.Services
@@ -121,6 +123,24 @@ namespace CrmBot.DataAccess.Services
                     chat.AccessToken = null;
                     await database.SaveChangesAsync();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Get list of active users' chats.
+        /// </summary>
+        public async Task<IEnumerable<long>> GetActiveChats()
+        {
+            using (var database = uow.Create())
+            {
+                return await (
+                    from chat in database.TelegramChats
+                    where
+                        chat.User != null
+                        && chat.AccessToken != null
+                    select chat.ChatId
+                )
+                .ToListAsync();
             }
         }
     }

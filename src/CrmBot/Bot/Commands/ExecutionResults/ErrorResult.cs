@@ -20,7 +20,7 @@ namespace CrmBot.Bot.Commands.ExecutionResults
         public async Task RenderResultAsync(TelegramBotClient bot, long chatId)
         {
             await bot.SendChatActionAsync(chatId, ChatAction.Typing);
-            await bot.SendTextMessageAsync(chatId, exception.Message);
+            await bot.SendTextMessageAsync(chatId, "Oops, something went wrong.");
         }
     }
 }

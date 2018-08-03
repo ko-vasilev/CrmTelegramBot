@@ -1,6 +1,7 @@
 ﻿using CrmBot.Bot.Commands;
 using CrmBot.Bot.Commands.ExecutionResults;
 using CrmBot.Bot.Commands.Models;
+using CrmBot.Internal;
 using CrmBot.Services;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -19,15 +20,21 @@ namespace CrmBot.Bot
         /// <summary>
         /// .ctor
         /// </summary>
-        public TelegramBotMessageHandler(IServiceProvider serviceProvider, ConversationService conversationService)
+        public TelegramBotMessageHandler(
+            IServiceProvider serviceProvider,
+            ConversationService conversationService,
+            AppSettings appSettings)
         {
             this.serviceProvider = serviceProvider;
             this.conversationService = conversationService;
+            this.appSettings = appSettings;
         }
 
         private readonly IServiceProvider serviceProvider;
 
         private readonly ConversationService conversationService;
+
+        private readonly AppSettings appSettings;
 
         /// <summary>
         /// Handle a chat message.
@@ -35,12 +42,21 @@ namespace CrmBot.Bot
         /// <param name="chatId">Id of the chat.</param>
         /// <param name="messageText">Text message.</param>
         /// <returns>Result of the command execution.</returns>
-        public async Task<ICommandExecutionResult> HandleMessage(long chatId, string messageText)
+        public async Task<ICommandExecutionResult> HandleMessage(int senderId, long chatId, string messageText)
         {
-            var command = GetAssociatedCommand(chatId, messageText, out var commandContext);
-            command.CommandContext = commandContext;
+            try
+            {
+                var command = GetAssociatedCommand(senderId, chatId, messageText, out var commandContext);
+                command.CommandContext = commandContext;
 
-            return await ExecuteCommand(command);
+                return await ExecuteCommand(command);
+            }
+            catch (Exception ex)
+            {
+                var telemetry = serviceProvider.GetService<TelemetryClient>();
+                telemetry.TrackException(ex);
+                return new ErrorResult(ex);
+            }
         }
 
         /// <summary>
@@ -92,8 +108,9 @@ namespace CrmBot.Bot
         /// </summary>
         /// <param name="commandContext">Associated command context.</param>
         /// <returns>Instance of a command which should handle the message.</returns>
-        private ICommand GetAssociatedCommand(long chatId, string messageText, out CommandContext commandContext)
+        private ICommand GetAssociatedCommand(int senderId, long chatId, string messageText, out CommandContext commandContext)
         {
+            messageText = messageText ?? string.Empty;
             commandContext = new CommandContext
             {
                 ChatId = chatId,
@@ -121,7 +138,7 @@ namespace CrmBot.Bot
             if (commandName != string.Empty)
             {
                 Type commandType = null;
-                switch(commandName)
+                switch (commandName)
                 {
                     case CommandList.Start:
                     case CommandList.Connect:
@@ -136,9 +153,27 @@ namespace CrmBot.Bot
                     case CommandList.DailyReportNotificationsSubscribe:
                         commandType = typeof(SubscribeDailyReportNotificationsCommand);
                         break;
+                    case CommandList.JobsList:
+                        commandType = typeof(GetDayJobsCommand);
+                        break;
                     case CommandList.Help:
                         commandType = typeof(HelpCommand);
                         break;
+                }
+
+                if (commandType == null)
+                {
+                    var senderIsAdmin = senderId == appSettings.HelpUserTelegramId;
+                    if (senderIsAdmin)
+                    {
+                        switch (commandName)
+                        {
+                            case AdminCommandList.Broadcast:
+                                commandType = typeof(BroadcastMessageCommand);
+                                break;
+                        }
+
+                    }
                 }
                 if (commandType != null)
                 {
