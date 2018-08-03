@@ -35,5 +35,5 @@ Task package -description 'Make publish package.' `
 Task publish -depends pre-publish, package, update-database -description 'Publish CrmBot project to remote server.' `
     -requiredVariables @('Configuration') `
 {
-    Invoke-WebSiteDeployment "$workspace\pub\CrmBot" $ServerHost $SiteName -Application '' $MSDeployParams @('-enableRule:AppOffline')
+    Invoke-WebSiteDeployment "$workspace\pub\CrmBot" $ServerHost $SiteName -Application '' -MSDeployParams @('-enableRule:AppOffline')
 }
