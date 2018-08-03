@@ -37,10 +37,19 @@ namespace CrmBot.Bot
         /// <returns>Result of the command execution.</returns>
         public async Task<ICommandExecutionResult> HandleMessage(long chatId, string messageText)
         {
-            var command = GetAssociatedCommand(chatId, messageText, out var commandContext);
-            command.CommandContext = commandContext;
+            try
+            {
+                var command = GetAssociatedCommand(chatId, messageText, out var commandContext);
+                command.CommandContext = commandContext;
 
-            return await ExecuteCommand(command);
+                return await ExecuteCommand(command);
+            }
+            catch (Exception ex)
+            {
+                var telemetry = serviceProvider.GetService<TelemetryClient>();
+                telemetry.TrackException(ex);
+                return new ErrorResult(ex);
+            }
         }
 
         /// <summary>
