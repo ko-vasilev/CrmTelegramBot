@@ -39,7 +39,7 @@ namespace CrmBot.Bot
         {
             var currentChatId = e.Message.Chat.Id;
 
-            var result = await commandHandler.HandleMessage(currentChatId, e.Message.Text);
+            var result = await commandHandler.HandleMessage(e.Message.From.Id, currentChatId, e.Message.Text);
             await result.RenderResultAsync(botClient, currentChatId);
         }
 

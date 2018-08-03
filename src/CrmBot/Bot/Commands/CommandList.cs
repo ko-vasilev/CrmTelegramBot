@@ -19,4 +19,12 @@
 
         public const string Help = "help";
     }
+
+    /// <summary>
+    /// Specifies a list of commands available only to admins.
+    /// </summary>
+    public static class AdminCommandList
+    {
+        public const string Broadcast = "broadcast";
+    }
 }
