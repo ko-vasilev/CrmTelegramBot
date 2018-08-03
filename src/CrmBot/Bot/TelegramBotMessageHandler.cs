@@ -103,6 +103,7 @@ namespace CrmBot.Bot
         /// <returns>Instance of a command which should handle the message.</returns>
         private ICommand GetAssociatedCommand(long chatId, string messageText, out CommandContext commandContext)
         {
+            messageText = messageText ?? string.Empty;
             commandContext = new CommandContext
             {
                 ChatId = chatId,
