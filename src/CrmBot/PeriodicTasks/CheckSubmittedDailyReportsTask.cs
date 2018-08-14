@@ -80,16 +80,26 @@ namespace CrmBot.PeriodicTasks
             var userDayInfo = await crmService.GetDayInfo(chatId, userCurrentDate);
 
             var isOfficeHoliday = branchHoliday != null;
+            bool? isUserWorkDay = null;
+            if (userDayInfo != null)
+            {
+                isUserWorkDay = userDayInfo.isWorkDay;
+                // Temporary fix, remove when CRM API is fixed to correctly return information about vacations
+                if (userDayInfo.description != null && userDayInfo.description.Contains("vacation", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    isUserWorkDay = false;
+                }
+            }
             if (isOfficeHoliday)
             {
-                if (userDayInfo != null && userDayInfo.isWorkDay)
+                if (isUserWorkDay == true)
                 {
                     return true;
                 }
                 return false;
             }
 
-            if (userDayInfo != null && userDayInfo.isWorkDay == false)
+            if (isUserWorkDay == false)
             {
                 return false;
             }
