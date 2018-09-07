@@ -17,6 +17,8 @@
 
         public const string JobsList = "joblist";
 
+        public const string CheckDailyReport = "checkdr";
+
         public const string Help = "help";
     }
 

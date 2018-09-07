@@ -156,6 +156,9 @@ namespace CrmBot.Bot
                     case CommandList.JobsList:
                         commandType = typeof(GetDayJobsCommand);
                         break;
+                    case CommandList.CheckDailyReport:
+                        commandType = typeof(CheckDailyReportExistsCommand);
+                        break;
                     case CommandList.Help:
                         commandType = typeof(HelpCommand);
                         break;
