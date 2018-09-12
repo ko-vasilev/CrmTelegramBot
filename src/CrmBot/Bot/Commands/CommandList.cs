@@ -1,10 +1,25 @@
-﻿namespace CrmBot.Bot.Commands
+﻿using System;
+using System.Collections.Generic;
+
+namespace CrmBot.Bot.Commands
 {
     /// <summary>
     /// Specifies a list of registered commands.
     /// </summary>
     public static class CommandList
     {
+        public static readonly IReadOnlyDictionary<string, Type> PublicCommands = new Dictionary<string, Type>()
+        {
+            { Start, typeof(GetAuthorizationUrlCommand) },
+            { Connect, typeof(GetAuthorizationUrlCommand) },
+            { DailyReport, typeof(UpdateDailyReportCommand) },
+            { Jobs, typeof(GetDayJobProgressCommand) },
+            { DailyReportNotificationsSubscribe, typeof(SubscribeDailyReportNotificationsCommand) },
+            { JobsList, typeof(GetDayJobsCommand) },
+            { CheckDailyReport, typeof(CheckDailyReportExistsCommand) },
+            { Help, typeof(HelpCommand) }
+        };
+
         public const string Start = "start";
 
         public const string Connect = "connect";
