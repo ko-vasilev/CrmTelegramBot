@@ -121,6 +121,7 @@ namespace CrmBot
             services.AddTransient<GetDayJobsCommand>();
             services.AddTransient<BroadcastMessageCommand>();
             services.AddTransient<CheckDailyReportExistsCommand>();
+            services.AddTransient<UnSubscribeDailyReportNotificationsCommand>();
         }
     }
 }

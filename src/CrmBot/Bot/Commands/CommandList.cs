@@ -15,6 +15,7 @@ namespace CrmBot.Bot.Commands
             { DailyReport, typeof(UpdateDailyReportCommand) },
             { Jobs, typeof(GetDayJobProgressCommand) },
             { DailyReportNotificationsSubscribe, typeof(SubscribeDailyReportNotificationsCommand) },
+            { DailyReportNotificationsUnsubscribe, typeof(UnSubscribeDailyReportNotificationsCommand) },
             { JobsList, typeof(GetDayJobsCommand) },
             { CheckDailyReport, typeof(CheckDailyReportExistsCommand) },
             { Help, typeof(HelpCommand) }
@@ -29,6 +30,8 @@ namespace CrmBot.Bot.Commands
         public const string Jobs = "jobs";
 
         public const string DailyReportNotificationsSubscribe = "subscribedr";
+
+        public const string DailyReportNotificationsUnsubscribe = "unsubscribedr";
 
         public const string JobsList = "joblist";
 

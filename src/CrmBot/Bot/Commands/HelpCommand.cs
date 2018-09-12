@@ -79,6 +79,7 @@ msg: `/{CommandList.CheckDailyReport}`
 Check if you have submitted a daily report yesterday:
 msg: `/{CommandList.CheckDailyReport} -1`"
             },
+            { typeof(UnSubscribeDailyReportNotificationsCommand), "Unsubscribe from missing daily report notifications." },
             {
                 typeof(HelpCommand),
                 @"Helpception 🤔"
@@ -97,6 +98,7 @@ msg: `/{CommandList.CheckDailyReport} -1`"
 /{CommandList.Jobs} `date` - Get jobs summary for a day
 /{CommandList.JobsList} `date` - Get list of jobs for a day
 /{CommandList.DailyReportNotificationsSubscribe} `hour`_(default: 21)_ - Subscribe for daily report notifications. After the `hour` if you have not submitted a daily report (but should have), you will receive a notification
+/{CommandList.DailyReportNotificationsUnsubscribe} - Unsubscribe from missing daily report notifications
 /{CommandList.CheckDailyReport} `date` - Check whether or not you have submitted a daily report for specified date
 /{CommandList.Connect} - Generate a link from which you can authorize the bot in CRM
 /{CommandList.Help} `command` - Get information about available commands. If `command` is specified, a detailed help text regarding the command will be shown
