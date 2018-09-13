@@ -3,6 +3,7 @@ using CrmBot.DataAccess.Models;
 using CrmBot.DataAccess.Services;
 using CrmBot.Internal.Scheduling;
 using CrmBot.Services;
+using Microsoft.ApplicationInsights;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +21,13 @@ namespace CrmBot.PeriodicTasks
         public CheckSubmittedDailyReportsTask(
             CrmService crmService,
             TelegramBot telegramBot,
-            NotificationSubscriptionService subscriptionService)
+            NotificationSubscriptionService subscriptionService,
+            TelemetryClient telemetry)
         {
             this.crmService = crmService;
             this.telegramBot = telegramBot;
             this.subscriptionService = subscriptionService;
+            this.telemetry = telemetry;
         }
 
         private readonly CrmService crmService;
@@ -32,6 +35,8 @@ namespace CrmBot.PeriodicTasks
         private readonly TelegramBot telegramBot;
 
         private readonly NotificationSubscriptionService subscriptionService;
+
+        private readonly TelemetryClient telemetry;
 
         public string Schedule => "0 * * * *"; // at the start of each hour
 
@@ -60,6 +65,7 @@ namespace CrmBot.PeriodicTasks
                     cancellationToken.ThrowIfCancellationRequested();
                     if (shouldSubmitDailyReport && !await crmService.DailyReportExists(user.Chat.ChatId, userCurrentDate))
                     {
+                        telemetry.TrackEvent("Missing Daily Report Notification");
                         await telegramBot.NotifyMissedDailyReportAsync(user.Chat.ChatId);
                     }
                     subscription.LastCheck = checkStart;
@@ -67,7 +73,7 @@ namespace CrmBot.PeriodicTasks
                 }
                 catch (Exception ex)
                 {
-                    // TODO: log exception
+                    telemetry.TrackException(ex);
                 }
             }
         }
