@@ -46,6 +46,24 @@ namespace CrmBot.DataAccess.Services
         }
 
         /// <summary>
+        /// Unsubscribe user from notifications.
+        /// </summary>
+        /// <param name="userId">Id of the user.</param>
+        /// <param name="notificationType">Type of notifications to unsubscrie from.</param>
+        public async Task NotificationsUnsubscribe(int userId, EventType notificationType)
+        {
+            using (var database = uow.Create())
+            {
+                var subscription = await database.NotificationSubscriptions.FirstOrDefaultAsync(s => s.UserId == userId && s.EventType == notificationType);
+                if (subscription != null)
+                {
+                    database.NotificationSubscriptions.Remove(subscription);
+                    await database.SaveChangesAsync();
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets list of subscriptions.
         /// </summary>
         /// <param name="relativeDate">Only subscriptions with last trigger date later than this value will be returned.</param>

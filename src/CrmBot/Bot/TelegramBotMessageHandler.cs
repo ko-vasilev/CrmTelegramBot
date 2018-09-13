@@ -138,27 +138,9 @@ namespace CrmBot.Bot
             if (commandName != string.Empty)
             {
                 Type commandType = null;
-                switch (commandName)
+                if (CommandList.PublicCommands.ContainsKey(commandName))
                 {
-                    case CommandList.Start:
-                    case CommandList.Connect:
-                        commandType = typeof(GetAuthorizationUrlCommand);
-                        break;
-                    case CommandList.DailyReport:
-                        commandType = typeof(UpdateDailyReportCommand);
-                        break;
-                    case CommandList.Jobs:
-                        commandType = typeof(GetDayJobProgressCommand);
-                        break;
-                    case CommandList.DailyReportNotificationsSubscribe:
-                        commandType = typeof(SubscribeDailyReportNotificationsCommand);
-                        break;
-                    case CommandList.JobsList:
-                        commandType = typeof(GetDayJobsCommand);
-                        break;
-                    case CommandList.Help:
-                        commandType = typeof(HelpCommand);
-                        break;
+                    commandType = CommandList.PublicCommands[commandName];
                 }
 
                 if (commandType == null)
@@ -172,7 +154,6 @@ namespace CrmBot.Bot
                                 commandType = typeof(BroadcastMessageCommand);
                                 break;
                         }
-
                     }
                 }
                 if (commandType != null)
