@@ -25,7 +25,11 @@ namespace CrmBot.Bot.Commands.ExecutionResults
         {
             foreach (var result in Results)
             {
-                await result.RenderResultAsync(bot, chatId);
+                try
+                {
+                    await result.RenderResultAsync(bot, chatId);
+                }
+                catch (Exception) { }
             }
         }
     }
