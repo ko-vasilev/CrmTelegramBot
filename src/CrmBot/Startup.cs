@@ -93,7 +93,6 @@ namespace CrmBot
             }
 
             app.UseMvc();
-            loggerFactory.AddApplicationInsights(app.ApplicationServices, LogLevel.Error);
 
             // Initialize the telegram bot
             app.ApplicationServices.GetService<TelegramBot>();

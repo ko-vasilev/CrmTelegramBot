@@ -84,7 +84,7 @@ namespace CrmBot.Bot
             var telemetry = serviceProvider.GetService<TelemetryClient>();
             using (var operation = telemetry.StartOperation<RequestTelemetry>(command.GetType().Name))
             {
-                operation.Telemetry.Context.Properties.Add("ChatId", command.CommandContext.ChatId.ToString());
+                operation.Telemetry.Properties.Add("ChatId", command.CommandContext.ChatId.ToString());
 
                 try
                 {
